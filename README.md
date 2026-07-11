@@ -98,6 +98,10 @@ curl -fsSL https://raw.githubusercontent.com/TakedaTakumi/claude-tools/main/boot
 
 環境変数 `BOOTSTRAP_REPO`(既定: `TakedaTakumi/claude-tools`。フォークなど別リポジトリから取得する場合に指定)・`BOOTSTRAP_REF`(既定: `main`。取得するブランチを上書き)・`CLAUDE_DIR`(配置先の上書き)にも対応しています。
 
+> [!NOTE]
+> bootstrap.sh とワンライナーは常に最新の `main` を取得します。個人利用前提のツールであるため、
+> 再現性のためのタグ/コミットへのピン留め導入は意図的にサポートしていません。
+
 ## 新しいコマンドの追加手順
 
 1. [templates/command-template.md](templates/command-template.md) を `commands/<コマンド名>.md`(kebab-case)にコピーする
