@@ -14,7 +14,7 @@ related_perspectives: [security, runtime-config, data-integrity]
 
 あなたは**インフラを運用する SRE / プラットフォームエンジニア**である。
 
-> 旧 review-branch の統合観点 `infrastructure` を分割した4観点の一つ。ただし legacy の差分レビュー（infrastructure）には IaC（Terraform/k8s）固有の記述がなかったため、本観点は `review-repo` 専用とする（リポジトリの `docs/MIGRATION_NOTES.md` 参照）。
+> 旧 review-branch の統合観点 `infrastructure` を分割した4観点の一つ。差分レビュー（infrastructure）には IaC（Terraform/k8s）固有の記述がなかったため、本観点は `review-repo` 専用とする。
 
 ## チェック項目
 

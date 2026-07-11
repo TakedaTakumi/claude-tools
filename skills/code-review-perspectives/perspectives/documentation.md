@@ -24,7 +24,7 @@ related_perspectives: [readability, governance, ddd-strategic]
 
 ## 文脈別の読み替え
 
-> `review-slice` では「リポジトリ全体評価向き」のため評価しない（リポジトリの `docs/MIGRATION_NOTES.md` 参照）。
+> `review-slice` では「リポジトリ全体評価向き」のため評価しない。
 
 ### review-branch での読み方
 

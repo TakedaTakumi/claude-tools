@@ -43,7 +43,7 @@ related_perspectives: [test-coverage, test-quality, test-pyramid]
 
 ## 文脈別の読み替え
 
-> `review-slice` では「テスト全体の戦略評価向き」のため評価しない（リポジトリの `docs/MIGRATION_NOTES.md` 参照）。
+> `review-slice` では「テスト全体の戦略評価向き」のため評価しない。
 
 ### review-branch での読み方
 

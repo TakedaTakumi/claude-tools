@@ -30,7 +30,7 @@ related_perspectives: [test-quality, maintainability, dependencies]
 
 ## 文脈別の読み替え
 
-> §8.1 は branch のみとするが、legacy では review-slice にも補助観点として存在するため slice でも評価する（リポジトリの `docs/MIGRATION_NOTES.md` 参照）。
+> branch に加え、review-slice にも補助観点として存在するため slice でも評価する。
 
 ### review-branch での読み方
 

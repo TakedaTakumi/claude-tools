@@ -23,7 +23,7 @@ related_perspectives: [performance, maintainability, architecture-drift]
 
 ## 文脈別の読み替え
 
-> 本観点は `review-repo` 専用（Git 履歴全体が必要）。`review-slice` は情報不足のため評価しない、`review-branch` では扱わない（リポジトリの `docs/MIGRATION_NOTES.md` 参照）。
+> 本観点は `review-repo` 専用（Git 履歴全体が必要）。`review-slice` は情報不足のため評価しない、`review-branch` では扱わない。
 
 ### review-repo での読み方
 

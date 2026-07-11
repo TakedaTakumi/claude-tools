@@ -27,7 +27,7 @@ related_perspectives: [security, error-handling]
 
 ## 文脈別の読み替え
 
-> §8.1 の表は repo/slice のみだが、legacy では review-branch にも observability の記述があるため branch でも評価する（リポジトリの `docs/MIGRATION_NOTES.md` 参照）。
+> repo/slice に加え、review-branch にも observability の記述があるため branch でも評価する。
 
 ### review-branch での読み方
 

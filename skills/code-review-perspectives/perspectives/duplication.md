@@ -23,7 +23,7 @@ related_perspectives: [maintainability, dead-code]
 
 ## 文脈別の読み替え
 
-> `review-branch` では `maintainability` の DRY 違反として扱い、`review-slice` では情報不足のため評価しない（リポジトリの `docs/MIGRATION_NOTES.md` 参照）。本観点は `review-repo` 専用。
+> `review-branch` では `maintainability` の DRY 違反として扱い、`review-slice` では情報不足のため評価しない。本観点は `review-repo` 専用。
 
 ### review-repo での読み方
 

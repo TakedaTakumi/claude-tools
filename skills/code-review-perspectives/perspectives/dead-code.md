@@ -24,7 +24,7 @@ related_perspectives: [duplication, maintainability, dependencies]
 
 ## 文脈別の読み替え
 
-> `review-slice` では情報不足のため評価しない、`review-branch` では扱わない（リポジトリの `docs/MIGRATION_NOTES.md` 参照）。本観点は `review-repo` 専用。
+> `review-slice` では情報不足のため評価しない、`review-branch` では扱わない。本観点は `review-repo` 専用。
 
 ### review-repo での読み方
 

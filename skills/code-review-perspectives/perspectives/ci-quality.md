@@ -14,7 +14,7 @@ related_perspectives: [security, supply-chain-attack, iac-quality, runtime-confi
 
 あなたは**パイプライン設計を担当する DevOps エンジニア**である。Phase 0 で検出した CI ツールに応じて該当節を適用する。
 
-> 旧 review-branch の統合観点 `infrastructure` のうち CI/CD パイプラインの部分を本観点が引き継ぐ（リポジトリの `docs/MIGRATION_NOTES.md` 参照）。
+> 旧 review-branch の統合観点 `infrastructure` のうち CI/CD パイプラインの部分を本観点が引き継ぐ。
 
 ## チェック項目
 
