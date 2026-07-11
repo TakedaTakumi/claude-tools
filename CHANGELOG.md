@@ -17,7 +17,7 @@
 - **Skill** `skills/code-review-perspectives/`: 33観点・8分類・6テンプレートのコードレビュー観点ライブラリ(`SKILL.md` がカタログ + マトリクス + 索引)
 - **config/CLAUDE.md**: `~/.claude/CLAUDE.md` に配置するグローバルユーザーメモリ
 - **install.sh**: `~/.claude/` への symlink / コピー配置スクリプト(bash 3.2+、上書きガードあり)
-- **bootstrap.sh**: git clone せずに導入するためのブートストラップスクリプト(`gh` CLI 必須)
+- **bootstrap.sh**: git clone せずに導入するためのブートストラップスクリプト(curl のみで動作、認証不要)
 - **Makefile**: `make install` / `make install-copy` / `make install-force` / `make install-copy-force` / `make help`
 - **.github/workflows/check.yml**: GitHub Actions CI(Unicode 不可視文字スキャン・shellcheck・gitleaks、`main` トリガーのみ、全 action commit SHA pin)
 - **docs/**: USAGE / MAINTAINER_NOTES / ARCHITECTURE / PERSPECTIVES / CATEGORIES

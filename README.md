@@ -84,19 +84,19 @@ make install-copy-force   # ./install.sh --copy --force 相当
 
 ### clone せずに導入する(bootstrap.sh)
 
-このリポジトリを clone せずに導入したい場合は、`bootstrap.sh` を使います。GitHub の Contents API でファイルを取得して実行し、内部で `install.sh --copy` を実行します。前提として [`gh` コマンド](https://cli.github.com/) がインストール済みかつ認証済み(`gh auth login`)である必要があります。
+このリポジトリを clone せずに導入したい場合は、`bootstrap.sh` を使います。リポジトリの tarball を curl で取得して展開し、内部で `install.sh --copy` を実行します。前提は curl(macOS / Linux 標準装備)のみで、認証は不要です(公開リポジトリ前提)。
 
 ```bash
-gh api repos/TakedaTakumi/claude-tools/contents/bootstrap.sh -H "Accept: application/vnd.github.raw" | bash
+curl -fsSL https://raw.githubusercontent.com/TakedaTakumi/claude-tools/main/bootstrap.sh | bash
 ```
 
 これ1本で `CLAUDE.md` + `commands/` + `agents/` + `skills/` を含む Claude Code 環境全体が整います。`--force` などのオプションを渡す場合は `bash -s --` に続けて指定します。
 
 ```bash
-gh api repos/TakedaTakumi/claude-tools/contents/bootstrap.sh -H "Accept: application/vnd.github.raw" | bash -s -- --force
+curl -fsSL https://raw.githubusercontent.com/TakedaTakumi/claude-tools/main/bootstrap.sh | bash -s -- --force
 ```
 
-環境変数 `BOOTSTRAP_REPO`(既定: `TakedaTakumi/claude-tools`。フォークなど別リポジトリから取得する場合に指定)と `CLAUDE_DIR`(配置先の上書き)にも対応しています。
+環境変数 `BOOTSTRAP_REPO`(既定: `TakedaTakumi/claude-tools`。フォークなど別リポジトリから取得する場合に指定)・`BOOTSTRAP_REF`(既定: `main`。取得するブランチを上書き)・`CLAUDE_DIR`(配置先の上書き)にも対応しています。
 
 ## 新しいコマンドの追加手順
 
