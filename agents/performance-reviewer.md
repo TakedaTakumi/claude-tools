@@ -1,6 +1,7 @@
 ---
 name: performance-reviewer
 description: 性能・データ観点（performance, hotspot, data-integrity）の専門レビュアー。静的パフォーマンスパターン・変更頻度ホットスポット・データ整合性（トランザクション/冪等性）を担当する。
+model: opus
 tools: Read, Grep, Glob, Bash(git:*), Bash(rg:*)
 ---
 

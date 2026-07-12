@@ -1,6 +1,7 @@
 ---
 name: quality-reviewer
 description: コード品質観点（maintainability, readability, duplication, dead-code, error-handling, compatibility）の専門レビュアー。保守性・可読性・コード重複・未参照コード・エラーハンドリング・後方互換性を担当する。
+model: sonnet
 tools: Read, Grep, Glob, Bash(git:*), Bash(rg:*)
 ---
 

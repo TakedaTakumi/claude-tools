@@ -1,6 +1,7 @@
 ---
 name: ddd-reviewer
 description: DDD観点（ddd-tactical, ddd-strategic）の専門レビュアー。戦術的設計（集約・エンティティ・値オブジェクト・リポジトリ等）と戦略的設計（境界づけられたコンテキスト・コンテキストマップ・成熟度）を担当する。DDD 採用前提。
+model: opus
 tools: Read, Grep, Glob, Bash(git:*), Bash(rg:*)
 ---
 
