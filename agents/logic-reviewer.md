@@ -1,6 +1,7 @@
 ---
 name: logic-reviewer
 description: 条件分岐観点（logic-correctness）の専門レビュアー。境界値分析・同値分割・デシジョンテーブル・switch/match のケース網羅・論理式の等価性・特殊値（null/NaN/時刻境界等）を担当する。
+model: opus
 tools: Read, Grep, Glob, Bash(git:*), Bash(rg:*)
 ---
 
