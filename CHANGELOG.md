@@ -7,7 +7,7 @@
 
 ### Added
 
-- **Sub Agent** `agents/` に5ファイル追加: coder / coder-hard / researcher / researcher-deep / tester(観点レビュアー12個とは別のユーティリティエージェント。tools は最小権限の原則に従い、実行系は Read/Write/Edit + 限定的な Bash(git:*)、調査系は Read/Grep/Glob(+WebSearch/WebFetch)で明示指定)
+- **Sub Agent** `agents/` に5ファイル追加: coder / coder-hard / researcher / researcher-deep / tester(観点レビュアー12個とは別のユーティリティエージェント。tools は最小権限の原則に従い、コーディング系は Read/Write/Edit + Bash(git:*)、テスト実行を担う tester は Read/Write/Edit + Bash、調査系は Read/Grep/Glob(+WebSearch/WebFetch)で明示指定)
 - **汎用コマンド** `commands/new-issue.md` を追加: 会話の文脈・依頼内容からタイトル・本文を作成し、ユーザーの承認を得たうえで `gh issue create` で issue を作成する(`allowed-tools`: `Bash(git rev-parse:*)`, `Bash(gh issue create:*)`, `Read`, `Grep`, `Glob`)
 
 ### Changed
@@ -20,6 +20,7 @@
 - `agents/tester.md`: tools に `Edit` を追加(`Read, Write, Edit, Bash`)
 - `agents/coder.md` / `agents/coder-hard.md`: tools は `Read, Write, Edit, Bash(git:*)` のまま維持し、ビルド・リント・既存テストの実行検証はメインエージェント経由で tester に委ねる方針に指示文を修正
 - `docs/MAINTAINER_NOTES.md`: 「Sub Agent を追加・改修する場合」のチェックリストを観点レビュアー向け(`*-reviewer.md`)とユーティリティエージェント向け(coder / coder-hard / tester / researcher / researcher-deep)に分割。ユーティリティ向けには `model:` の明示指定(`inherit` 禁止、Fable モデル運用ルールと整合)・git commit/push 禁止の明記・完了報告での文面系成果物の全文提示・README/USAGE との整合確認・CHANGELOG 記録を追加
+- `docs/MAINTAINER_NOTES.md`: ユーティリティエージェント向けチェックリストの tools 例示に、テスト実行など任意のシェルコマンド実行が職務の場合は制限のない `Bash` を許容する旨を追記
 
 ## [0.1.0] - 2026-07-11
 
