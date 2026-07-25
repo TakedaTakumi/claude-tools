@@ -1,6 +1,7 @@
 ---
 name: coder
 description: 通常難易度のコーディング作業を実行する。機能追加、バグ修正、小〜中規模の変更に使用する。
+tools: Read, Write, Edit, Bash(git:*)
 model: sonnet
 ---
 

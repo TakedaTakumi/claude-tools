@@ -1,7 +1,7 @@
 ---
 name: researcher-deep
 description: 高度な調査を担当する。ライブラリ仕様の深掘り、複数ソースの比較検討、アーキテクチャの分析に使用する。
-tools: Read, Grep, Glob, Bash, WebSearch, WebFetch
+tools: Read, Grep, Glob, WebSearch, WebFetch
 model: sonnet
 ---
 

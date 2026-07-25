@@ -1,7 +1,7 @@
 ---
 name: researcher
 description: 軽量な調査を担当する。コードベース内のファイル探索、実装箇所の特定、単純な事実確認に使用する。
-tools: Read, Grep, Glob, Bash
+tools: Read, Grep, Glob
 model: haiku
 ---
 
