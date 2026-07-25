@@ -33,7 +33,9 @@
 
 ```
 skills/code-review-perspectives/   # 観点ライブラリ(SKILL.md + perspectives/ + categories/ + templates/)
-agents/                            # 観点グループ別の Sub Agent(12個)
+agents/                            # Sub Agent環境
+                                   # - 観点レビュアー(12個、*-reviewer.md)
+                                   # - ユーティリティエージェント(5個)
 commands/                          # 全11コマンド(汎用8 + レビュー用3、薄いオーケストレータ)
 config/CLAUDE.md                   # グローバルユーザーメモリ
 docs/                              # ドキュメント
