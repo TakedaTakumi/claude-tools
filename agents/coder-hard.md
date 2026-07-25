@@ -1,6 +1,7 @@
 ---
 name: coder-hard
 description: 高難度のコーディング作業を実行する。設計判断を伴う変更、複雑なリファクタリング、難解なバグの修正に使用する。
+tools: Read, Write, Edit, Bash(git:*)
 model: opus
 ---
 

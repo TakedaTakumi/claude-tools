@@ -1,6 +1,7 @@
 ---
 name: tester
 description: テストの作成と実行を担当する。ユニットテスト、プロパティベーステストの作成、テストスイートの実行と結果分析に使用する。
+tools: Read, Write, Bash
 model: sonnet
 ---
 
