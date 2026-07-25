@@ -8,6 +8,7 @@
 ### Added
 
 - **Sub Agent** `agents/` に5ファイル追加: coder / coder-hard / researcher / researcher-deep / tester(観点レビュアー12個とは別のユーティリティエージェント。tools は最小権限の原則に従い、実行系は Read/Write/Edit + 限定的な Bash(git:*)、調査系は Read/Grep/Glob(+WebSearch/WebFetch)で明示指定)
+- **汎用コマンド** `commands/new-issue.md` を追加: 会話の文脈・依頼内容からタイトル・本文を作成し、ユーザーの承認を得たうえで `gh issue create` で issue を作成する(`allowed-tools`: `Bash(git rev-parse:*)`, `Bash(gh issue create:*)`, `Read`, `Grep`, `Glob`)
 
 ### Changed
 
