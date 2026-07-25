@@ -5,9 +5,22 @@
 
 ## [Unreleased]
 
+### Added
+
+- **Sub Agent** `agents/` に5ファイル追加: coder / coder-hard / researcher / researcher-deep / tester(観点レビュアー12個とは別のユーティリティエージェント。tools は最小権限の原則に従い、コーディング系は Read/Write/Edit + Bash(git:*)、テスト実行を担う tester は Read/Write/Edit + Bash、調査系は Read/Grep/Glob(+WebSearch/WebFetch)で明示指定)
+- **汎用コマンド** `commands/new-issue.md` を追加: 会話の文脈・依頼内容からタイトル・本文を作成し、ユーザーの承認を得たうえで `gh issue create` で issue を作成する(`allowed-tools`: `Bash(git rev-parse:*)`, `Bash(gh issue create:*)`, `Read`, `Grep`, `Glob`)
+
 ### Changed
 
 - `/sync-docs`: 現在のブランチに紐づく PR のタイトル・本文も更新検討の対象に追加(承認後に `gh pr edit` で更新。PR が無い場合や `gh` が使えない場合はスキップ)
+- `/new-pull-request`: `gh pr create` の前にタイトル・本文の全文をユーザーに提示して承認を得るステップを追加(無承認のまま Draft PR が作成される事故を防止)
+- `config/CLAUDE.md`: 文面系成果物(コミットメッセージ案・PR/issue文面・実装計画・提案文など)の確認を求める際は、質問ツールを呼ぶ前に全文を通常のテキストとして提示することを明記。Fable モデル運用時は、サブエージェントへの委任指示に全文報告を明記すること、およびオーケストレーターが文面を要約せずそのまま提示することを追加
+- `agents/coder.md` / `agents/coder-hard.md` / `agents/tester.md`: 完了報告に、コミットメッセージ案など作成した文面がある場合は全文を含めるよう明記
+- `agents/researcher.md` / `agents/researcher-deep.md`: 報告に調査結果の本文・作成した文面を要約せず含めるよう明記
+- `agents/tester.md`: tools に `Edit` を追加(`Read, Write, Edit, Bash`)
+- `agents/coder.md` / `agents/coder-hard.md`: tools は `Read, Write, Edit, Bash(git:*)` のまま維持し、ビルド・リント・既存テストの実行検証はメインエージェント経由で tester に委ねる方針に指示文を修正
+- `docs/MAINTAINER_NOTES.md`: 「Sub Agent を追加・改修する場合」のチェックリストを観点レビュアー向け(`*-reviewer.md`)とユーティリティエージェント向け(coder / coder-hard / tester / researcher / researcher-deep)に分割。ユーティリティ向けには `model:` の明示指定(`inherit` 禁止、Fable モデル運用ルールと整合)・git commit/push 禁止の明記・完了報告での文面系成果物の全文提示・README/USAGE との整合確認・CHANGELOG 記録を追加
+- `docs/MAINTAINER_NOTES.md`: ユーティリティエージェント向けチェックリストの tools 例示に、テスト実行など任意のシェルコマンド実行が職務の場合は制限のない `Bash` を許容する旨を追記
 
 ## [0.1.0] - 2026-07-11
 
