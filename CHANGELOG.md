@@ -5,9 +5,19 @@
 
 ## [Unreleased]
 
+### Added
+
+- **Sub Agent** `agents/` に5ファイル追加: coder / coder-hard / researcher / researcher-deep / tester(観点レビュアー12個とは別のユーティリティエージェント。tools は最小権限の原則に従い、実行系は Read/Write/Edit + 限定的な Bash(git:*)、調査系は Read/Grep/Glob(+WebSearch/WebFetch)で明示指定)
+
 ### Changed
 
 - `/sync-docs`: 現在のブランチに紐づく PR のタイトル・本文も更新検討の対象に追加(承認後に `gh pr edit` で更新。PR が無い場合や `gh` が使えない場合はスキップ)
+- `/new-pull-request`: `gh pr create` の前にタイトル・本文の全文をユーザーに提示して承認を得るステップを追加(無承認のまま Draft PR が作成される事故を防止)
+- `config/CLAUDE.md`: 文面系成果物(コミットメッセージ案・PR/issue文面・実装計画・提案文など)の確認を求める際は、質問ツールを呼ぶ前に全文を通常のテキストとして提示することを明記。Fable モデル運用時は、サブエージェントへの委任指示に全文報告を明記すること、およびオーケストレーターが文面を要約せずそのまま提示することを追加
+- `agents/coder.md` / `agents/coder-hard.md` / `agents/tester.md`: 完了報告に、コミットメッセージ案など作成した文面がある場合は全文を含めるよう明記
+- `agents/researcher.md` / `agents/researcher-deep.md`: 報告に調査結果の本文・作成した文面を要約せず含めるよう明記
+- `agents/tester.md`: tools に `Edit` を追加(`Read, Write, Edit, Bash`)
+- `agents/coder.md` / `agents/coder-hard.md`: tools は `Read, Write, Edit, Bash(git:*)` のまま維持し、ビルド・リント・既存テストの実行検証はメインエージェント経由で tester に委ねる方針に指示文を修正
 
 ## [0.1.0] - 2026-07-11
 
