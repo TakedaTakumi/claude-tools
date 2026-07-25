@@ -59,10 +59,27 @@
 
 ## Sub Agent を追加・改修する場合
 
-- [ ] `agents/<agent>.md` を作成・編集(`description` / `tools:` / 入力 / 評価手順 / 注意 の節構成)
+`agents/` には観点レビュアー(`*-reviewer.md`、12個)とユーティリティエージェント(coder / coder-hard / tester / researcher / researcher-deep、5個)の2種類があり、担当・節構成・成果物の性質が異なるため、種別ごとにチェックリストを分ける。
+
+### 観点レビュアーの場合(`*-reviewer.md`)
+
+- [ ] `agents/<agent>-reviewer.md` を作成・編集(`description` / `tools:` / 入力 / 評価手順 / 注意 の節構成)
 - [ ] `tools:` は **最小権限の原則** に従う(`Bash` を無制限に与えず、`Bash(git:*)` 等で絞る)
 - [ ] 対応する Slash Command(`commands/review-{branch,repo,slice}.md`)の委任先を更新
 - [ ] `docs/ARCHITECTURE.md` の Sub Agent 担当表を更新
+- [ ] CHANGELOG に記録
+
+### ユーティリティエージェントの場合(coder / coder-hard / tester / researcher / researcher-deep)
+
+観点評価を行わないため、frontmatter + 箇条書きの節構成を取る(観点レビュアーのような「評価手順」節は持たない)。
+
+- [ ] `agents/<agent>.md` を作成・編集(frontmatter + 箇条書きの節構成)
+- [ ] `tools:` は **最小権限の原則** に従う(実行系は `Read, Write, Edit, Bash(git:*)` 等、調査系は `Read, Grep, Glob`(+ `WebSearch` / `WebFetch`)等、担当作業に必要な範囲のみ付与する)
+- [ ] `model:` を明示指定する(`inherit` にしない。`config/CLAUDE.md` の Fable モデル運用ルールでサブエージェントへの Fable 系モデル使用を禁止しているため、明示指定でこれを担保する)
+- [ ] `git commit` / `git push` など git の履歴を変更する操作を行わない旨を本文に明記する(コミットはメインエージェントの責務)
+- [ ] 完了報告に、作成した文面系成果物(コミットメッセージ案・実装方針・調査結果本文など、該当する場合)を要約せず全文含めるよう本文に明記する(`config/CLAUDE.md` の文面系成果物の全文提示ルールと整合させる)
+- [ ] [README.md](../README.md) の `agents/` 構成説明(観点レビュアー/ユーティリティエージェントの内訳・個数)に差分が無いか確認し、必要なら更新する
+- [ ] [docs/USAGE.md](USAGE.md) に影響が無いか確認する(現状ユーティリティエージェントは対象外だが、記述が必要になった場合は追記する)
 - [ ] CHANGELOG に記録
 
 ## レビュー用 Slash Command を追加・改修する場合

@@ -18,6 +18,7 @@
 - `agents/researcher.md` / `agents/researcher-deep.md`: 報告に調査結果の本文・作成した文面を要約せず含めるよう明記
 - `agents/tester.md`: tools に `Edit` を追加(`Read, Write, Edit, Bash`)
 - `agents/coder.md` / `agents/coder-hard.md`: tools は `Read, Write, Edit, Bash(git:*)` のまま維持し、ビルド・リント・既存テストの実行検証はメインエージェント経由で tester に委ねる方針に指示文を修正
+- `docs/MAINTAINER_NOTES.md`: 「Sub Agent を追加・改修する場合」のチェックリストを観点レビュアー向け(`*-reviewer.md`)とユーティリティエージェント向け(coder / coder-hard / tester / researcher / researcher-deep)に分割。ユーティリティ向けには `model:` の明示指定(`inherit` 禁止、Fable モデル運用ルールと整合)・git commit/push 禁止の明記・完了報告での文面系成果物の全文提示・README/USAGE との整合確認・CHANGELOG 記録を追加
 
 ## [0.1.0] - 2026-07-11
 
