@@ -41,6 +41,7 @@ commands/                          # 全12コマンド(汎用9 + レビュー用
 config/CLAUDE.md                   # グローバルユーザーメモリ
 docs/                              # ドキュメント
 install.sh / bootstrap.sh          # ~/.claude/ への配置スクリプト
+check-sync.sh                      # 観点ライブラリの同期チェック(make check / CI)
 ```
 
 設計の全体像は [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)、観点・分類のカタログは [docs/PERSPECTIVES.md](docs/PERSPECTIVES.md) と [docs/CATEGORIES.md](docs/CATEGORIES.md) を参照。
@@ -72,6 +73,7 @@ make install              # ./install.sh 相当
 make install-copy         # ./install.sh --copy 相当
 make install-force        # ./install.sh --force 相当
 make install-copy-force   # ./install.sh --copy --force 相当
+make check                # 観点ライブラリの同期チェック(CI の sync ジョブと同一)
 ```
 
 ### 既定 = symlink、ただし以下では `--copy` を推奨
