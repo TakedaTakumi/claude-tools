@@ -10,7 +10,7 @@
 
 | 観点 | 適用 | 概要 |
 |---|---|---|
-| [security](../skills/code-review-perspectives/perspectives/security.md) | 🌿📦🔬 | 攻撃者目線。うっかりミス由来の脆弱性(入力検証・認証/認可・機密漏洩・暗号・SSRF/XXE 等) |
+| [security](../skills/code-review-perspectives/perspectives/security.md) | 🌿📦🔬 | 攻撃者目線。うっかりミス由来の脆弱性(入力検証はシンク・認証/認可・機密に到達するもの。他に暗号・SSRF/XXE 等) |
 | [supply-chain-attack](../skills/code-review-perspectives/perspectives/supply-chain-attack.md) | 🌿📦🔬 | 意図的な悪意の混入(バックドア・動的コード実行・隠れた転送・typosquatting・コミット署名異常) |
 
 ## コード品質系(quality-reviewer)
@@ -48,7 +48,7 @@
 | [test-strategy](../skills/code-review-perspectives/perspectives/test-strategy.md) | 🌿📦 | 例示 vs PBT の使い分け。代数法則・ラウンドトリップ・トートロジー検出 |
 | [test-pyramid](../skills/code-review-perspectives/perspectives/test-pyramid.md) | 📦 | ユニット/統合/E2E の比率と配置。逆ピラミッド・実行時間分布・ラベル違反 |
 
-## 条件分岐系(logic-reviewer)
+## 条件分岐・入力検証系(logic-reviewer)
 
 | 観点 | 適用 | 概要 |
 |---|---|---|
