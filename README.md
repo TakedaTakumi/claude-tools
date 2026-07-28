@@ -28,7 +28,7 @@
 
 レビューコマンドは、**Skill(観点ライブラリ)+ Sub Agent(専門ワーカー)+ 軽量 Slash Command(オーケストレータ)** の組み合わせで構成する。
 
-- **33観点 × 8分類**のマトリクスでブランチ差分／リポジトリ全体／機能スライスを評価
+- **34観点 × 8分類**のマトリクスでブランチ差分／リポジトリ全体／機能スライスを評価
 - 観点は1ファイル1観点で**単一情報源**。3コマンドが共有する Skill `code-review-perspectives` から参照
 - 観点グループごとに **Sub Agent が並列実行**、観点別に整理された出力を返す
 
@@ -118,7 +118,7 @@ curl -fsSL https://raw.githubusercontent.com/TakedaTakumi/claude-tools/main/boot
 - [docs/USAGE.md](docs/USAGE.md) — 全12コマンドの使い方・引数・実行例
 - [docs/MAINTAINER_NOTES.md](docs/MAINTAINER_NOTES.md) — コマンド・観点・Agent 追加/変更/削除時のチェックリスト
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — Skill + Sub Agent + Slash Command の設計
-- [docs/PERSPECTIVES.md](docs/PERSPECTIVES.md) — 33観点のカタログ
+- [docs/PERSPECTIVES.md](docs/PERSPECTIVES.md) — 34観点のカタログ
 - [docs/CATEGORIES.md](docs/CATEGORIES.md) — 8分類のカタログ
 - [CHANGELOG.md](CHANGELOG.md) — 変更履歴(Keep a Changelog 形式)
 

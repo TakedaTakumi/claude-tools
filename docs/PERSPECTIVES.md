@@ -1,4 +1,4 @@
-# PERSPECTIVES — 33観点カタログ(適用コマンド・Agent グルーピング ビュー)
+# PERSPECTIVES — 34観点カタログ(適用コマンド・Agent グルーピング ビュー)
 
 > **このファイルの位置付け**: 観点カタログの **一次資料は [skills/code-review-perspectives/SKILL.md](../skills/code-review-perspectives/SKILL.md)** です。本ファイルは「観点を担当 Sub Agent ごとにグルーピングし、適用コマンド(🌿📦🔬)を絵文字でひと目把握する」用途の**二次ビュー**として保持しています。観点の追加・改名時はまず SKILL.md を更新し、その後で本ファイルを同期してください(同期チェックリストは [MAINTAINER_NOTES.md](MAINTAINER_NOTES.md) 参照)。
 
@@ -53,6 +53,7 @@
 | 観点 | 適用 | 概要 |
 |---|---|---|
 | [logic-correctness](../skills/code-review-perspectives/perspectives/logic-correctness.md) | 🌿🔬 | 条件分岐の境界値・ケース網羅・論理式の等価性・特殊値の正しさ |
+| [input-validation](../skills/code-review-perspectives/perspectives/input-validation.md) | 🌿🔬 | 不正入力への防御。外部入力の未検証到達・暗黙の型強制・スキーマ素通しの検出 |
 
 ## 性能・データ系(performance-reviewer)
 
