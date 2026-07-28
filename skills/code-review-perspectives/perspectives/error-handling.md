@@ -20,7 +20,7 @@ related_perspectives: [data-integrity, observability, input-validation]
 - 過剰に広い catch（全例外を一括で握る）
 - リソースリーク（ファイル・コネクション・ロックの解放漏れ）
 - リトライ戦略（指数バックオフ、最大回数、冪等性）
-- ユーザー向けエラーメッセージと内部ログの分離
+- ユーザー向けエラーメッセージと内部ログの分離（分離と内部情報の露出が本観点。バリデーションエラーの内容の具体性は [input-validation](input-validation.md) の担当）
 - エラー時の状態の一貫性（部分的な状態変更が残らないか）
 
 ## 文脈別の読み替え
@@ -42,4 +42,4 @@ related_perspectives: [data-integrity, observability, input-validation]
 
 - [data-integrity](data-integrity.md): エラー時の状態一貫性・補償
 - [observability](observability.md): エラーのログ・追跡可能性
-- [input-validation](input-validation.md): 例外が発生した後の処理（捕捉・伝播・復旧）は本観点、不正値を入口で検知し応答する設計は input-validation の担当
+- [input-validation](input-validation.md): 例外が発生した後の処理（捕捉・伝播・復旧）は本観点、不正値を入口で検知し応答する設計は input-validation の担当。エラーメッセージは、内部情報の露出・内部ログとの分離が本観点、どの入力が・なぜ不正かの具体性は input-validation の担当
