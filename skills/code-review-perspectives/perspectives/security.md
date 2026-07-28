@@ -5,7 +5,7 @@ applicable_commands: [review-branch, review-repo, review-slice]
 applicable_categories_for_repo: [app, test, build, runtime, devenv, ci, iac, meta]
 primary_in_categories: [app, build, runtime, ci, iac, meta]
 auxiliary_in_categories: [test, devenv]
-related_perspectives: [supply-chain-attack, data-integrity, observability]
+related_perspectives: [supply-chain-attack, data-integrity, observability, input-validation]
 ---
 
 # security: 攻撃者目線（セキュリティ）
@@ -66,3 +66,4 @@ related_perspectives: [supply-chain-attack, data-integrity, observability]
 - [supply-chain-attack](supply-chain-attack.md): 意図的な悪意の混入は別観点で扱う
 - [data-integrity](data-integrity.md): トランザクション境界・TOCTOU
 - [observability](observability.md): ログへの機密混入は相互参照
+- [input-validation](input-validation.md): 攻撃経路が説明できる悪意ある入力は本観点、攻撃を伴わない不正値（null / NaN / 型違い等）への防御は input-validation の担当

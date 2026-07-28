@@ -5,7 +5,7 @@ applicable_commands: [review-branch, review-slice]
 applicable_categories_for_repo: []
 primary_in_categories: []
 auxiliary_in_categories: []
-related_perspectives: [test-coverage, error-handling, readability, data-integrity]
+related_perspectives: [test-coverage, error-handling, readability, data-integrity, input-validation]
 ---
 
 # logic-correctness: 条件分岐・ロジック正しさ
@@ -44,3 +44,4 @@ related_perspectives: [test-coverage, error-handling, readability, data-integrit
 - [error-handling](error-handling.md): 特殊値由来の例外処理の責務分担
 - [readability](readability.md): 分岐の「書き方」は readability、「網羅性・正しさ」は本観点
 - [data-integrity](data-integrity.md): 時刻・タイムゾーン境界の判定は相互参照
+- [input-validation](input-validation.md): 書かれた条件式そのものの正しさは本観点、検証の有無・配置・不正値検知後の振る舞いの設計は input-validation の担当

@@ -5,7 +5,7 @@ applicable_commands: [review-branch, review-slice]
 applicable_categories_for_repo: []
 primary_in_categories: []
 auxiliary_in_categories: []
-related_perspectives: [data-integrity, observability]
+related_perspectives: [data-integrity, observability, input-validation]
 ---
 
 # error-handling: エラーハンドリング/例外処理
@@ -42,3 +42,4 @@ related_perspectives: [data-integrity, observability]
 
 - [data-integrity](data-integrity.md): エラー時の状態一貫性・補償
 - [observability](observability.md): エラーのログ・追跡可能性
+- [input-validation](input-validation.md): 例外が発生した後の処理（捕捉・伝播・復旧）は本観点、不正値を入口で検知し応答する設計は input-validation の担当
