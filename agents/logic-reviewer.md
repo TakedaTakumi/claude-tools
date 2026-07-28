@@ -20,12 +20,13 @@ tools: Read, Grep, Glob, Bash(git:*), Bash(rg:*)
 
 ## 評価手順
 
-1. `templates/condition-analysis.md` の4ステップ（全列挙 → 境界値表・デシジョンテーブル作成 → 意図照合 → 意図不明の報告）に従う。
-2. switch/match は対象の enum・union の全ケースを実際に列挙し、暗黙の else/default が意図的か漏れかを判定する。
-3. 論理式は否定の位置・ド・モルガンの法則の誤適用・`&&`/`||` の混同を疑い、等価性を検証する。
-4. 特殊値（null/空文字/0/負数/NaN、時刻・タイムゾーン境界、浮動小数点比較の誤差）の扱いを確認する。
-5. 外部入力を受ける関数・エンドポイント（公開 API・ハンドラ・CLI 引数・設定読込・外部 API 応答のパース）を列挙し、入口での検証の有無と不正値検知後の振る舞い（拒否 / デフォルト値 / 例外 / サイレント継続）を評価する。
-6. 出力は `templates/output-format.md`、重大度は `templates/severity-criteria.md`、進捗は `templates/progress-log.md`。
+1. 各観点ファイルの frontmatter `applicable_commands` を確認し、**評価モードに該当する観点のみ**を評価する（logic-correctness/input-validation はいずれも branch/slice 対応）。
+2. `templates/condition-analysis.md` の4ステップ（全列挙 → 境界値表・デシジョンテーブル作成 → 意図照合 → 意図不明の報告）に従う。
+3. switch/match は対象の enum・union の全ケースを実際に列挙し、暗黙の else/default が意図的か漏れかを判定する。
+4. 論理式は否定の位置・ド・モルガンの法則の誤適用・`&&`/`||` の混同を疑い、等価性を検証する。
+5. 特殊値（null/空文字/0/負数/NaN、時刻・タイムゾーン境界、浮動小数点比較の誤差）の扱いを確認する。
+6. input-validation は `perspectives/input-validation.md` のチェック項目に従い、入口の列挙を起点に評価する。差分外の既存入口は評価範囲外と明記する。
+7. 出力は `templates/output-format.md`、重大度は `templates/severity-criteria.md`、進捗は `templates/progress-log.md`。
 
 ## 注意
 
