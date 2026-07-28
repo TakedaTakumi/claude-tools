@@ -31,7 +31,7 @@
 
 ## 観点を追加する場合
 
-このリポジトリの中核となる更新です。追加時は **以下のすべてを同期** してください(同期点の削減は中期課題)。
+このリポジトリの中核となる更新です。追加時は **以下のすべてを同期** してください。機械的に検証できる項目は `make check` で確認できます(同期点そのものの削減は中期課題)。
 
 - [ ] `skills/code-review-perspectives/perspectives/<key>.md` を追加(frontmatter キー: `key` / `display_name` / `applicable_commands` / `applicable_categories_for_repo` / `primary_in_categories` / `auxiliary_in_categories` / `related_perspectives`)
 - [ ] 本文の節構成を既存観点に合わせる(役割(人格)→ チェック項目 → 文脈別の読み替え → 関連観点。重大度の例は観点ファイルには書かず `templates/severity-criteria.md` に一元化する)
@@ -39,7 +39,13 @@
 - [ ] 該当する分類で評価する場合は `SKILL.md` の **分類 × 観点マトリクス**(`✅` / `⚠️`)にも反映
 - [ ] `docs/PERSPECTIVES.md` の観点リストにも追記
 - [ ] `skills/code-review-perspectives/templates/severity-criteria.md` の「観点別の Critical / High 例」表に行を追加
+- [ ] 観点数の表記を更新(`SKILL.md` の frontmatter `description` / 本文 / カタログ見出し、[README.md](../README.md)、[docs/PERSPECTIVES.md](PERSPECTIVES.md) の見出し、[docs/ARCHITECTURE.md](ARCHITECTURE.md) の構成図・理由表・担当範囲の末尾)
 - [ ] 担当 Sub Agent の `agents/<agent>.md` の `description` に追記(auto-invocation のヒント)
+- [ ] 担当 Sub Agent の**本文**も更新(担当観点ファイルの一覧・評価手順・「注意」節の責務分担。観点本体は観点ファイルが単一情報源なので、手順に本文を複製せず参照に留める)
+- [ ] [docs/ARCHITECTURE.md](ARCHITECTURE.md) の Sub Agent 担当表に観点キーを追加
+- [ ] 該当する `commands/review-{branch,repo,slice}.md` の委任ラベルを更新(担当 Agent の受け持ち範囲が変わるため)
+- [ ] 関連する既存観点の `related_perspectives` と「関連観点」節の**両方**に相互参照を追記(片方向で終わらせない)。境界は「どちらが担当か」を評価開始時点で機械的に判定できる基準で書く
+- [ ] `make check` で同期を検証(観点数表記・カタログ表・分類マトリクスの三者一致)
 - [ ] [CHANGELOG.md](../CHANGELOG.md) の `[Unreleased]` セクションに `### Added` で記録
 
 ## 分類を追加する場合(稀)
