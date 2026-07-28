@@ -32,6 +32,6 @@ tools: Read, Grep, Glob, Bash(git:*), Bash(rg:*)
 ## 注意
 
 - **error-handling との責務分担**: logic-correctness 観点は「分岐の正しさ」を担当する。例外の握りつぶし・リソースリーク等は error-handling に譲り、重複しそうな指摘はメインで統合される前提で自分の観点に集中する。
-- **input-validation の責務分担**: 攻撃経路が説明できる悪意ある入力は security-reviewer の担当、例外発生後の処理は quality-reviewer（error-handling）の担当、不正入力テストの欠如は test-reviewer（test-coverage）の担当。本エージェントは非悪意の不正値に対する実装側の防御（検証の有無・配置・検知後の振る舞い）を担当する。
+- **input-validation の責務分担**: 未検証の値がインジェクションのシンク・認証/認可の判定・機密の読み出しに到達する場合は security-reviewer の担当、例外発生後の処理は quality-reviewer（error-handling）の担当、不正入力テストの欠如は test-reviewer（test-coverage）の担当。本エージェントは計算・永続化・表示での値の破壊に対する実装側の防御（検証の有無・配置・検知後の振る舞い）を担当する。
 - 意図が確認できない条件を推測で通さない。
 - 結果は観点別に構造化して返す。推測で進めない。
