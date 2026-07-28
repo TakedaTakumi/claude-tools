@@ -68,7 +68,7 @@ presentation → application → domain → infrastructure
 
 ## 攻撃経路・悪意混入の注目ポイント
 
-フロー上で以下を確認する（security / supply-chain-attack のスライス文脈）:
+フロー上で以下を確認する（security / supply-chain-attack のスライス文脈。検証の配置評価は input-validation のスライス文脈でも本項を参照する）:
 
 - **入口での入力検証**と、**レイヤー越えで検証が抜ける箇所**。
 - 出口（DB・外部 API・ファイル）への到達経路での**インジェクション可能性**。
