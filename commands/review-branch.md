@@ -38,7 +38,7 @@ allowed-tools: Bash(git:*), Bash(gh:*), Bash(rg:*), Read, Grep, Glob
 
 決定した観点を担当 Agent ごとにまとめ、**並列に**委任する（各 Agent に 評価モード=`branch`・差分情報・適用観点を渡す）:
 
-- security 系 → `security-reviewer` / 品質系 → `quality-reviewer` / アーキ → `architecture-reviewer` / DDD → `ddd-reviewer` / テスト → `test-reviewer` / 条件分岐 → `logic-reviewer` / 性能・データ → `performance-reviewer` / ops（runtime-config/devenv-quality/ci-quality/observability）→ `ops-reviewer` / 依存 → `dependencies-reviewer` / メタ（documentation/i18n-a11y）→ `meta-reviewer` / 由来（code-provenance）→ `ownership-reviewer`
+- security 系 → `security-reviewer` / 品質系 → `quality-reviewer` / アーキ → `architecture-reviewer` / DDD → `ddd-reviewer` / テスト → `test-reviewer` / 条件分岐・入力検証 → `logic-reviewer` / 性能・データ → `performance-reviewer` / ops（runtime-config/devenv-quality/ci-quality/observability）→ `ops-reviewer` / 依存 → `dependencies-reviewer` / メタ（documentation/i18n-a11y）→ `meta-reviewer` / 由来（code-provenance）→ `ownership-reviewer`
 
 ### Phase 2: 集約とセルフレビュー
 
