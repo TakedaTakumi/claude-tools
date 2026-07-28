@@ -21,3 +21,9 @@ install-force: ## 本ツール由来でない同名エントリも確認なし�
 
 install-copy-force: ## コピーで配置かつ本ツール由来でない同名エントリも確認なしで上書き
 	$(INSTALL) --copy --force
+
+.PHONY: check
+
+## チェックを実行する ##
+check: ## 観点ライブラリの同期チェック（CI の sync ジョブと同一）
+	bash ./check-sync.sh

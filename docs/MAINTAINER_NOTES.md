@@ -107,13 +107,16 @@
 
 ## CI(GitHub Actions)
 
-`.github/workflows/check.yml` に3ジョブを置いています:
+`.github/workflows/check.yml` に4ジョブを置いています:
 
 | ジョブ | 内容 | ローカル再現 |
 |---|---|---|
-| `unicode` | コマンドファイル・観点ファイル等への不可視文字/双方向制御文字/BOM の混入検出(prompt injection 予防) | `grep -rPln '[\x{200B}-\x{200F}\x{202A}-\x{202E}\x{2066}-\x{2069}\x{FEFF}]' --include='*.md' --include='*.sh' --include='*.yml' --include='*.yaml' .` |
-| `shellcheck` | `install.sh` / `bootstrap.sh` の静的解析 | `shellcheck install.sh bootstrap.sh` |
+| `unicode` | コマンドファイル・観点ファイル等への不可視文字/双方向制御文字/BOM の混入検出(prompt injection 予防) | `LC_ALL=C.UTF-8 grep -rPln '[\x{200B}-\x{200F}\x{202A}-\x{202E}\x{2066}-\x{2069}\x{FEFF}]' --include='*.md' --include='*.sh' --include='*.yml' --include='*.yaml' .` |
+| `shellcheck` | `install.sh` / `bootstrap.sh` / `check-sync.sh` の静的解析 | `shellcheck install.sh bootstrap.sh check-sync.sh` |
+| `sync` | 観点ライブラリの同期漏れ検出(観点数表記・カタログ表・分類マトリクスの三者一致) | `make check`(= `bash ./check-sync.sh`) |
 | `gitleaks` | シークレットの誤コミット検出 | `gitleaks detect` |
+
+`unicode` のローカル再現で `LC_ALL=C.UTF-8` を付けるのは、`grep -P` の `\x{...}` が UTF-8 ロケール以外ではパターンをコンパイルできず終了コード 2 で失敗するためです(スキャン結果としての「マッチなし」= 1 と区別が必要)。
 
 トリガーは `main` への push、`pull_request`、`workflow_dispatch`(GitHub UI / `gh workflow run check.yml` から手動実行)のみ(`develop` 等の他ブランチは対象外)。公式・third-party を問わずすべての action を commit SHA pin し、コメントで対応タグを併記している。
 
