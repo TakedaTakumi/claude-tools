@@ -42,8 +42,13 @@ for k in "${keys[@]}"; do
 		fail "$SKILL: 観点カタログ表に $k の行がない"
 	fi
 done
-rows=$(grep -cE '^\|.*\]\(perspectives/[a-z0-9-]+\.md\)' "$SKILL" || true)
-if [ "$rows" -ne "$count" ]; then
+# grep の終了コードは 0=マッチあり / 1=マッチなし / 2以上=実行失敗。
+# 2以上を握り潰すと「検査できていないのに通過」になるため、明示的に分岐する。
+row_status=0
+rows=$(grep -cE '^\|.*\]\(perspectives/[a-z0-9-]+\.md\)' "$SKILL") || row_status=$?
+if [ "$row_status" -gt 1 ]; then
+	fail "$SKILL: 観点カタログ表の行数を数えられなかった (grep exit $row_status)"
+elif [ "$rows" -ne "$count" ]; then
 	fail "$SKILL: 観点カタログ表の行数 ($rows) が観点ファイル数 ($count) と一致しない"
 fi
 
@@ -56,12 +61,19 @@ done
 
 # 4. 各ドキュメントの観点数表記が実ファイル数と一致するか
 #    CHANGELOG は過去バージョン時点の数を記録するため除外する
-while IFS= read -r line; do
-	[ -n "$line" ] || continue
-	fail "観点数の表記が実ファイル数 ($count) と一致しない: $line"
-done < <(grep -rnE '[0-9]{2} ?観点' --include='*.md' . |
-	grep -v '^\./CHANGELOG\.md:' |
-	grep -vE "${count} ?観点" || true)
+#    走査そのものの失敗（終了コード 2 以上）は握り潰さず、検査不能として報告する
+scan_status=0
+mentions=$(grep -rnE '[0-9]{2} ?観点' --include='*.md' .) || scan_status=$?
+if [ "$scan_status" -gt 1 ]; then
+	fail "観点数表記の走査を実行できなかった (grep exit $scan_status)"
+else
+	while IFS= read -r line; do
+		[ -n "$line" ] || continue
+		fail "観点数の表記が実ファイル数 ($count) と一致しない: $line"
+	done < <(printf '%s\n' "$mentions" |
+		grep -v '^\./CHANGELOG\.md:' |
+		grep -vE "${count} ?観点" || true)
+fi
 
 # 5. 三者一致: applicable_categories_for_repo が空 <=> 分類 × 観点マトリクスに行がない
 #    (docs/ARCHITECTURE.md「マトリクスの整合性」で定めた不変条件)
