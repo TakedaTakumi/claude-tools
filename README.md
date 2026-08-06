@@ -28,7 +28,7 @@
 
 レビューコマンドは、**Skill(観点ライブラリ)+ Sub Agent(専門ワーカー)+ 軽量 Slash Command(オーケストレータ)** の組み合わせで構成する。
 
-- **33観点 × 8分類**のマトリクスでブランチ差分／リポジトリ全体／機能スライスを評価
+- **34観点 × 8分類**のマトリクスでブランチ差分／リポジトリ全体／機能スライスを評価
 - 観点は1ファイル1観点で**単一情報源**。3コマンドが共有する Skill `code-review-perspectives` から参照
 - 観点グループごとに **Sub Agent が並列実行**、観点別に整理された出力を返す
 
@@ -41,6 +41,7 @@ commands/                          # 全12コマンド(汎用9 + レビュー用
 config/CLAUDE.md                   # グローバルユーザーメモリ
 docs/                              # ドキュメント
 install.sh / bootstrap.sh          # ~/.claude/ への配置スクリプト
+check-sync.sh                      # 観点ライブラリの同期チェック(make check / CI)
 ```
 
 設計の全体像は [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)、観点・分類のカタログは [docs/PERSPECTIVES.md](docs/PERSPECTIVES.md) と [docs/CATEGORIES.md](docs/CATEGORIES.md) を参照。
@@ -72,6 +73,7 @@ make install              # ./install.sh 相当
 make install-copy         # ./install.sh --copy 相当
 make install-force        # ./install.sh --force 相当
 make install-copy-force   # ./install.sh --copy --force 相当
+make check                # 観点ライブラリの同期チェック(CI の sync ジョブと同一)
 ```
 
 ### 既定 = symlink、ただし以下では `--copy` を推奨
@@ -118,7 +120,7 @@ curl -fsSL https://raw.githubusercontent.com/TakedaTakumi/claude-tools/main/boot
 - [docs/USAGE.md](docs/USAGE.md) — 全12コマンドの使い方・引数・実行例
 - [docs/MAINTAINER_NOTES.md](docs/MAINTAINER_NOTES.md) — コマンド・観点・Agent 追加/変更/削除時のチェックリスト
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — Skill + Sub Agent + Slash Command の設計
-- [docs/PERSPECTIVES.md](docs/PERSPECTIVES.md) — 33観点のカタログ
+- [docs/PERSPECTIVES.md](docs/PERSPECTIVES.md) — 34観点のカタログ
 - [docs/CATEGORIES.md](docs/CATEGORIES.md) — 8分類のカタログ
 - [CHANGELOG.md](CHANGELOG.md) — 変更履歴(Keep a Changelog 形式)
 

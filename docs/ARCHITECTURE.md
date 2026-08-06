@@ -24,7 +24,7 @@
 ┌──────────────────────────────────────────────────┐
 │ Skill: code-review-perspectives(観点ライブラリ)   │
 │  SKILL.md(カタログ + マトリクス + 索引)             │
-│  perspectives/*.md  — 33 観点(1観点 = 1ファイル)   │
+│  perspectives/*.md  — 34 観点(1観点 = 1ファイル)   │
 │  categories/*.md    — 8 分類(app/test/build/...)  │
 │  templates/*.md     — 6 テンプレ(重大度・出力・進捗・エスカレ・slice-flow・条件分岐) │
 └──────────────────────────────────────────────────┘
@@ -36,13 +36,13 @@
 - **段階的開示(Progressive Disclosure)**: メインコンテキストには SKILL.md と必要な観点だけをロード。全観点を一度に読み込まない
 - **関心の分離**: Skill = 観点定義 / Sub Agent = 評価実行 / Slash Command = オーケストレーション
 - **並列性**: 観点グループごとに Sub Agent を**並列**実行(観点数が多くてもコンテキスト枯渇を避ける)
-- **拡張容易性**: 観点追加は1ファイル追加のみで完結(カタログ表に行を足す＋担当 Agent に追記)
+- **拡張容易性**: 観点の**定義**は1ファイル追加で完結する(本体を他所に分散させない)。ただしカタログ表・観点数表記・担当 Agent・委任ラベルへの同期点は複数ファイルに残るため、機械的に検証できる範囲は `make check`(CI の `sync` ジョブ)で担保する(同期点の削減は中期課題)
 
 ## なぜこの構成か
 
 | 要素 | 理由 |
 |---|---|
-| **Skill** | 33観点 × 8分類 = 重複しがちな構造を単一情報源に。`SKILL.md` の auto-invocation で「コードレビュー」用途を自動認識 |
+| **Skill** | 34観点 × 8分類 = 重複しがちな構造を単一情報源に。`SKILL.md` の auto-invocation で「コードレビュー」用途を自動認識 |
 | **Sub Agent** | 観点グループを独立コンテキストで評価でき、メインの探索ノイズで汚さない。並列実行で速い |
 | **Slash Command** | ユーザーは `/review-branch` のような明示呼び出しを期待する。薄いオーケストレータに留め、本体は Skill に置く |
 
@@ -69,7 +69,7 @@
 | `architecture-reviewer` | architecture, architecture-drift, monorepo |
 | `ddd-reviewer` | ddd-tactical, ddd-strategic |
 | `test-reviewer` | test-coverage, test-quality, test-strategy, test-pyramid |
-| `logic-reviewer` | logic-correctness |
+| `logic-reviewer` | logic-correctness, input-validation |
 | `performance-reviewer` | performance, hotspot, data-integrity |
 | `ops-reviewer` | runtime-config, devenv-quality, ci-quality, iac-quality, observability |
 | `dependencies-reviewer` | dependencies |
@@ -77,7 +77,7 @@
 | `ownership-reviewer` | ownership, code-provenance |
 | `slice-flow-reviewer` | slice-cohesion ＋ 入口→出口情報フロー追跡(review-slice 専用) |
 
-合計33観点を**漏れ・重複なく**カバーする。
+合計34観点を**漏れ・重複なく**カバーする。
 
 ## 観点・分類・コマンドの観点適用
 

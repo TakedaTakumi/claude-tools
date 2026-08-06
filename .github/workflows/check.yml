@@ -24,27 +24,51 @@ jobs:
       - name: scan
         run: |
           set -euo pipefail
-          if grep -rPln '[\x{200B}-\x{200F}\x{202A}-\x{202E}\x{2066}-\x{2069}\x{FEFF}]' \
+          # grep -P の \x{...} は UTF-8 ロケール以外ではパターンをコンパイルできず exit 2 になる。
+          # 2 を「マッチなし」と取り違えると、走っていないスキャンが緑になる。
+          # ロケールを固定し、終了コードを 0/1/その他に分けて判定する。
+          export LC_ALL=C.UTF-8
+          status=0
+          grep -rPln '[\x{200B}-\x{200F}\x{202A}-\x{202E}\x{2066}-\x{2069}\x{FEFF}]' \
               --include='*.md' \
               --include='*.sh' \
               --include='*.yml' \
               --include='*.yaml' \
-              .; then
-            echo "::error::invisible or bidi control characters detected" >&2
-            exit 1
-          fi
-          echo "OK: no invisible/bidi characters"
+              . || status=$?
+          case "$status" in
+            0)
+              echo "::error::invisible or bidi control characters detected" >&2
+              exit 1
+              ;;
+            1)
+              echo "OK: no invisible/bidi characters"
+              ;;
+            *)
+              echo "::error::scan did not run (grep exited ${status})" >&2
+              exit 1
+              ;;
+          esac
 
-  # install.sh / bootstrap.sh の静的解析。bash 3.2+ 想定。
+  # シェルスクリプトの静的解析。bash 3.2+ 想定。
   shellcheck:
-    name: shellcheck install.sh bootstrap.sh
+    name: shellcheck shell scripts
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4.3.1
       - name: install shellcheck
         run: sudo apt-get update && sudo apt-get install -y shellcheck
       - name: run
-        run: shellcheck install.sh bootstrap.sh
+        run: shellcheck install.sh bootstrap.sh check-sync.sh
+
+  # 観点ライブラリの同期漏れ検出。観点追加時の更新箇所(カタログ表・観点数表記・
+  # 分類マトリクス)は散在しており、一部だけ更新された状態は目視では気付けない。
+  sync:
+    name: perspective library sync check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4.3.1
+      - name: run
+        run: bash ./check-sync.sh
 
   # シークレットスキャン。実コードを置かない設計だが将来寄稿時の事故防止。
   # gitleaks-action は third-party のため commit SHA pin。

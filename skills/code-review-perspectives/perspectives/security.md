@@ -5,7 +5,7 @@ applicable_commands: [review-branch, review-repo, review-slice]
 applicable_categories_for_repo: [app, test, build, runtime, devenv, ci, iac, meta]
 primary_in_categories: [app, build, runtime, ci, iac, meta]
 auxiliary_in_categories: [test, devenv]
-related_perspectives: [supply-chain-attack, data-integrity, observability]
+related_perspectives: [supply-chain-attack, data-integrity, observability, input-validation]
 ---
 
 # security: 攻撃者目線（セキュリティ）
@@ -16,12 +16,12 @@ related_perspectives: [supply-chain-attack, data-integrity, observability]
 
 ## チェック項目
 
-- 入力検証の欠如（インジェクション: SQL, OS Command, LDAP, XPath, NoSQL, テンプレート）
+- 入力検証の欠如（インジェクション: SQL, OS Command, LDAP, XPath, NoSQL, テンプレート。これらのシンクに到達しない不正値への防御は [input-validation](input-validation.md) の担当）
 - 認証・認可の抜け道（権限チェック忘れ、IDOR の可能性、トークン検証の不備）
 - 機密情報の漏洩（ハードコードされた秘密、ログ・エラーメッセージへの露出、デバッグ情報）
 - セキュアでないデフォルト（暗号アルゴリズム、TLS 設定、CORS、Cookie 属性）
 - 競合状態・TOCTOU
-- 信頼境界の越境（外部入力が検証なく内部処理へ）
+- 信頼境界の越境（外部入力が検証なく内部処理へ。到達先がインジェクションのシンク・認証/認可の判定・機密のいずれでもない場合は [input-validation](input-validation.md) の担当）
 - 依存ライブラリの既知 CVE（バージョンが疑わしいものは指摘）
 - SSRF / XXE / Open Redirect / パストラバーサル
 - レート制限・ブルートフォース耐性
@@ -57,7 +57,7 @@ related_perspectives: [supply-chain-attack, data-integrity, observability]
 ### review-slice での読み方
 
 スライスの入口（プレゼン層）から最深部（インフラ層）まで、攻撃が到達可能かを評価する（[slice-flow-template](../templates/slice-flow-template.md)）:
-- 入口での入力検証 / レイヤー越えで検証が抜ける箇所
+- 入口での入力検証 / レイヤー越えで検証が抜ける箇所（到達先がインジェクションのシンク・認証/認可の判定・機密のいずれでもない場合は [input-validation](input-validation.md) の担当）
 - 出口（DB、外部 API、ファイル）への到達経路でのインジェクション可能性
 - 認証・認可がレイヤーのどこで実施されているか、漏れがないか
 
@@ -66,3 +66,4 @@ related_perspectives: [supply-chain-attack, data-integrity, observability]
 - [supply-chain-attack](supply-chain-attack.md): 意図的な悪意の混入は別観点で扱う
 - [data-integrity](data-integrity.md): トランザクション境界・TOCTOU
 - [observability](observability.md): ログへの機密混入は相互参照
+- [input-validation](input-validation.md): 未検証の値の**到達先**で切り分ける。インジェクションのシンク・認証/認可の判定・機密の読み出しに到達するなら本観点、計算・永続化・表示での値の破壊は input-validation の担当。到達先が特定できない検証欠落は、重大度を低めに付けたうえで本観点からも報告する（双方が「相手の担当」と判断して落とす事故を防ぐ）

@@ -5,7 +5,7 @@ applicable_commands: [review-branch, review-repo, review-slice]
 applicable_categories_for_repo: [test]
 primary_in_categories: [test]
 auxiliary_in_categories: []
-related_perspectives: [test-quality, test-strategy, test-pyramid]
+related_perspectives: [test-quality, test-strategy, test-pyramid, input-validation]
 ---
 
 # test-coverage: テスト網羅性
@@ -21,6 +21,7 @@ related_perspectives: [test-quality, test-strategy, test-pyramid]
 - 公開 API の全分岐がカバーされているか
 - 削除されたコードに対応するテストも適切に削除/更新されているか
 - **PBT 採用箇所の読み替え**: PBT で検証されている関数では「分岐網羅」ではなく「性質網羅」で評価する（満たすべき不変条件・代数法則・ラウンドトリップ性のうち、どれが性質として表明されていないか）。例示でカバーすべき境界値（過去の回帰、業務ルール閾値）が PBT に吸収されて**例示として残っていない**ケースは指摘対象。
+- 不正な入力値（null / undefined / NaN / 空文字 / 型違い / 範囲外の数値 / 未知の enum 値）に対する拒否（例外送出を含む）・フォールバック等の応答を検証するテストの有無。PBT で検証されている関数では、生成器がこれらの特殊値に到達しているかで判定し、例示テストの欠如とは**別カウントしない**。
 
 ## 文脈別の読み替え
 
@@ -47,3 +48,4 @@ related_perspectives: [test-quality, test-strategy, test-pyramid]
 - [test-quality](test-quality.md): 網羅性とは別軸のテストの信頼性
 - [test-strategy](test-strategy.md): 例示 vs PBT の使い分け
 - [test-pyramid](test-pyramid.md): テスト種類のバランス
+- [input-validation](input-validation.md): 不正入力テストの欠如の指摘は本観点、実装側の防御の設計は input-validation の担当

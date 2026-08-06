@@ -413,5 +413,5 @@ slice で評価しない観点(`documentation`, `dead-code`, `duplication`, `hot
 
 - **VSCode 拡張でコマンドが補完に出ない** → `./install.sh --copy` でコピー配置にする(README の「既定 = symlink」表を参照)
 - **`sh install.sh` でエラー** → `./install.sh` または `bash install.sh` で実行(dash 非対応)
-- **観点を追加したのに認識されない** → SKILL.md のカタログ表に行を追加、担当 Agent の description にも追記。`--copy` モードなら `./install.sh --copy` を再実行
+- **観点を追加したのに認識されない** → SKILL.md のカタログ表に行を追加、担当 Agent の description にも追記。`make check` で同期漏れ(カタログ表・観点数表記・分類マトリクス)を検証できる。`--copy` モードなら `./install.sh --copy` を再実行
 - **新しいコマンドが `/<コマンド名>` で見つからない** → `templates/command-template.md` からコマンドを追加した場合、`./install.sh` を再実行して `~/.claude/commands/` に反映してから確認する

@@ -31,7 +31,7 @@
 
 ## 観点を追加する場合
 
-このリポジトリの中核となる更新です。追加時は **以下のすべてを同期** してください(同期点の削減は中期課題)。
+このリポジトリの中核となる更新です。追加時は **以下のすべてを同期** してください。機械的に検証できる項目は `make check` で確認できます(同期点そのものの削減は中期課題)。
 
 - [ ] `skills/code-review-perspectives/perspectives/<key>.md` を追加(frontmatter キー: `key` / `display_name` / `applicable_commands` / `applicable_categories_for_repo` / `primary_in_categories` / `auxiliary_in_categories` / `related_perspectives`)
 - [ ] 本文の節構成を既存観点に合わせる(役割(人格)→ チェック項目 → 文脈別の読み替え → 関連観点。重大度の例は観点ファイルには書かず `templates/severity-criteria.md` に一元化する)
@@ -39,7 +39,13 @@
 - [ ] 該当する分類で評価する場合は `SKILL.md` の **分類 × 観点マトリクス**(`✅` / `⚠️`)にも反映
 - [ ] `docs/PERSPECTIVES.md` の観点リストにも追記
 - [ ] `skills/code-review-perspectives/templates/severity-criteria.md` の「観点別の Critical / High 例」表に行を追加
+- [ ] 観点数の表記を更新(`SKILL.md` の frontmatter `description` / 本文 / カタログ見出し、[README.md](../README.md)、[docs/PERSPECTIVES.md](PERSPECTIVES.md) の見出し、[docs/ARCHITECTURE.md](ARCHITECTURE.md) の構成図・理由表・担当範囲の末尾)
 - [ ] 担当 Sub Agent の `agents/<agent>.md` の `description` に追記(auto-invocation のヒント)
+- [ ] 担当 Sub Agent の**本文**も更新(担当観点ファイルの一覧・評価手順・「注意」節の責務分担。観点本体は観点ファイルが単一情報源なので、手順に本文を複製せず参照に留める)
+- [ ] [docs/ARCHITECTURE.md](ARCHITECTURE.md) の Sub Agent 担当表に観点キーを追加
+- [ ] 該当する `commands/review-{branch,repo,slice}.md` の委任ラベルを更新(担当 Agent の受け持ち範囲が変わるため)
+- [ ] 関連する既存観点の `related_perspectives` と「関連観点」節の**両方**に相互参照を追記(片方向で終わらせない)。境界は「どちらが担当か」を評価開始時点で機械的に判定できる基準で書く
+- [ ] `make check` で同期を検証(観点数表記・カタログ表・分類マトリクスの三者一致)
 - [ ] [CHANGELOG.md](../CHANGELOG.md) の `[Unreleased]` セクションに `### Added` で記録
 
 ## 分類を追加する場合(稀)
@@ -107,13 +113,16 @@
 
 ## CI(GitHub Actions)
 
-`.github/workflows/check.yml` に3ジョブを置いています:
+`.github/workflows/check.yml` に4ジョブを置いています:
 
 | ジョブ | 内容 | ローカル再現 |
 |---|---|---|
-| `unicode` | コマンドファイル・観点ファイル等への不可視文字/双方向制御文字/BOM の混入検出(prompt injection 予防) | `grep -rPln '[\x{200B}-\x{200F}\x{202A}-\x{202E}\x{2066}-\x{2069}\x{FEFF}]' --include='*.md' --include='*.sh' --include='*.yml' --include='*.yaml' .` |
-| `shellcheck` | `install.sh` / `bootstrap.sh` の静的解析 | `shellcheck install.sh bootstrap.sh` |
+| `unicode` | コマンドファイル・観点ファイル等への不可視文字/双方向制御文字/BOM の混入検出(prompt injection 予防) | `LC_ALL=C.UTF-8 grep -rPln '[\x{200B}-\x{200F}\x{202A}-\x{202E}\x{2066}-\x{2069}\x{FEFF}]' --include='*.md' --include='*.sh' --include='*.yml' --include='*.yaml' .` |
+| `shellcheck` | `install.sh` / `bootstrap.sh` / `check-sync.sh` の静的解析 | `shellcheck install.sh bootstrap.sh check-sync.sh` |
+| `sync` | 観点ライブラリの同期漏れ検出(観点数表記・カタログ表・分類マトリクスの三者一致) | `make check`(= `bash ./check-sync.sh`) |
 | `gitleaks` | シークレットの誤コミット検出 | `gitleaks detect` |
+
+`unicode` のローカル再現で `LC_ALL=C.UTF-8` を付けるのは、`grep -P` の `\x{...}` が UTF-8 ロケール以外ではパターンをコンパイルできず終了コード 2 で失敗するためです(スキャン結果としての「マッチなし」= 1 と区別が必要)。
 
 トリガーは `main` への push、`pull_request`、`workflow_dispatch`(GitHub UI / `gh workflow run check.yml` から手動実行)のみ(`develop` 等の他ブランチは対象外)。公式・third-party を問わずすべての action を commit SHA pin し、コメントで対応タグを併記している。
 
