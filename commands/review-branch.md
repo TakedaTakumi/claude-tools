@@ -14,7 +14,7 @@ allowed-tools: Bash(git:*), Bash(gh:*), Bash(rg:*), Read, Grep, Glob
 
 ## 引数仕様（`$ARGUMENTS`）
 
-- `--base=<branch>`: ベースブランチ（スペース区切り `--base <branch>` は不可＝エラー停止）。未指定なら GitHub デフォルトブランチを自動取得。
+- `--base=<branch>`: ベースブランチ（スペース区切り `--base <branch>` は不可＝エラー停止）。未指定なら、現在ブランチの PR のベース → reflog のブランチ作成記録 → GitHub デフォルトブランチ、の順で自動判定。
 - 先頭の非フラグ引数 = PERSPECTIVES（カンマ区切り、空 or `all` で全観点）。余剰引数はエラー停止。
 - 評価可能な観点 = Skill の各観点 frontmatter で `applicable_commands` に `review-branch` を含むもの。
 - 不明なフラグ・観点名は開始前にユーザー確認（推測で進めない）。
@@ -24,7 +24,7 @@ allowed-tools: Bash(git:*), Bash(gh:*), Bash(rg:*), Read, Grep, Glob
 ### Phase 0: 準備（ベースブランチ決定 & 差分取得）
 
 1. `git rev-parse --is-inside-work-tree` で確認。
-2. BASE_BRANCH 決定（引数 > `gh repo view --json defaultBranchRef` > `git symbolic-ref refs/remotes/origin/HEAD` > ローカル main/master）。決定根拠を明示。
+2. BASE_BRANCH 決定（引数 > `gh pr view --json baseRefName`（現在ブランチの open PR） > `git reflog show <branch>` 末尾の `branch: Created from <base>` > `gh repo view --json defaultBranchRef` > `git symbolic-ref refs/remotes/origin/HEAD` > ローカル main/master）。決定根拠を明示。
 3. remote 鮮度確認（`git fetch --dry-run origin <BASE>`）。更新があれば fetch するかユーザー確認（勝手に fetch しない）。
 4. 現在ブランチ取得。base == head ならエラー停止。
 5. マージベース取得 → 差分（`--name-status` / `--stat` / 詳細 diff、大きければファイル単位）。

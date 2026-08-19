@@ -1,7 +1,7 @@
 ---
 description: ベースブランチとの差分を要約する
 argument-hint: "--base=<branch>"
-allowed-tools: Bash(git rev-parse:*), Bash(git merge-base:*), Bash(git diff:*), Bash(git log:*), Read, Grep, Glob
+allowed-tools: Bash(git rev-parse:*), Bash(git merge-base:*), Bash(git diff:*), Bash(git log:*), Bash(git reflog:*), Bash(gh pr view:*), Read, Grep, Glob
 ---
 
 # Summarize Diff
@@ -15,7 +15,7 @@ allowed-tools: Bash(git rev-parse:*), Bash(git merge-base:*), Bash(git diff:*), 
 ## 引数仕様(`$ARGUMENTS`)
 
 - `--base=<branch>`: ベースブランチを指定する(例: `--base=main`)。スペース区切りの `--base <branch>` は不可(エラー停止)。
-- 未指定の場合は `git rev-parse --abbrev-ref origin/HEAD` またはローカルの `main` / `master`(`git rev-parse --verify` で存在確認)を自動判定する。判定根拠を出力に明示する。
+- 未指定の場合は、現在ブランチの open PR のベース(`gh pr view --json baseRefName`) → ブランチ作成記録(`git reflog show <branch>` 末尾の `branch: Created from <base>`) → `git rev-parse --abbrev-ref origin/HEAD` またはローカルの `main` / `master`(`git rev-parse --verify` で存在確認)、の順で自動判定する。判定根拠を出力に明示する。
 - 上記以外の引数が渡された場合はエラー停止し、ユーザーに確認する(推測で進めない)。
 
 ## 実行手順
