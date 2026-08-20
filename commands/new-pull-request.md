@@ -20,7 +20,7 @@ push 済みの変更に対して、内容を正しく反映した Draft PR を�
 
 1. `git rev-parse --is-inside-work-tree` でリポジトリ内であることを確認する。push 済みであることを前提とし、push 自体は行わない。
 2. `git rev-parse --abbrev-ref HEAD` で現在のブランチ名を取得する。
-3. ベースブランチを判定する: ブランチ作成記録(`git reflog show <branch>` 末尾の `branch: Created from <base>`) → `git rev-parse --abbrev-ref origin/HEAD`(取得できなければローカルの `main` / `master` を `git rev-parse --verify` で存在確認する)、の順で判定する。
+3. ベースブランチを判定する: 手順2で取得したブランチ名を対象に `git reflog show <手順2のブランチ名>` 末尾の `branch: Created from <base>`(ブランチ作成記録) → `git rev-parse --abbrev-ref origin/HEAD`(取得できなければローカルの `main` / `master` を `git rev-parse --verify` で存在確認する)、の順で判定する。
 4. `git merge-base <base> HEAD` でマージベースを取得し、`git diff <merge-base>..HEAD` と `git log --oneline <merge-base>..HEAD` で変更内容を把握する。必要に応じて Read/Grep で変更ファイルの詳細を確認する。
 5. タイトルを決定する: `$ARGUMENTS` があればそれを使い、無ければ差分から生成する。
 6. 本文を差分内容の要約として作成する。

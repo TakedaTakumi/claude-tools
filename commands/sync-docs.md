@@ -14,7 +14,7 @@ allowed-tools: Bash(git rev-parse:*), Bash(git diff:*), Bash(git status:*), Bash
 
 ## 引数仕様(`$ARGUMENTS`)
 
-- `--base=<branch>`: 差分のベースブランチ。省略時は、現在ブランチの open PR のベース(`gh pr view --json baseRefName`) → ブランチ作成記録(`git reflog show <branch>` 末尾の `branch: Created from <base>`) → `git rev-parse --abbrev-ref origin/HEAD` またはローカルの main / master(`git rev-parse --verify` で存在確認)、の順で自動判定する
+- `--base=<branch>`: 差分のベースブランチ。省略時は、現在ブランチの open PR のベース(`gh pr view --json baseRefName --jq '.baseRefName'`。PR が存在しない場合は失敗するため次の判定へ進む) → 現在のブランチの作成記録(`git reflog show <現在のブランチ>` 末尾の `branch: Created from <base>`) → `git rev-parse --abbrev-ref origin/HEAD` またはローカルの main / master(`git rev-parse --verify` で存在確認)、の順で自動判定する
 - 対象パス(0個以上): ドキュメント探索の範囲をこのパス配下に限定する。省略時はリポジトリ全体から自動探索する
 
 ## 実行手順
