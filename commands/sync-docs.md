@@ -1,7 +1,7 @@
 ---
 description: ブランチでの変更に伴い、仕様書などのドキュメントを追随して更新する
 argument-hint: "[--base=<branch>] [対象パス...]"
-allowed-tools: Bash(git rev-parse:*), Bash(git diff:*), Bash(git status:*), Bash(git log:*), Bash(gh pr view:*), Bash(gh pr edit:*), Read, Grep, Glob, Edit, Write
+allowed-tools: Bash(git rev-parse:*), Bash(git diff:*), Bash(git status:*), Bash(git log:*), Bash(git reflog:*), Bash(gh pr view:*), Bash(gh pr edit:*), Read, Grep, Glob, Edit, Write
 ---
 
 # Sync Docs
@@ -14,7 +14,7 @@ allowed-tools: Bash(git rev-parse:*), Bash(git diff:*), Bash(git status:*), Bash
 
 ## 引数仕様(`$ARGUMENTS`)
 
-- `--base=<branch>`: 差分のベースブランチ。省略時は `git rev-parse --abbrev-ref origin/HEAD` またはローカルの main / master(`git rev-parse --verify` で存在確認)を自動判定する
+- `--base=<branch>`: 差分のベースブランチ。省略時は、現在ブランチの open PR のベース(`gh pr view --json baseRefName --jq '.baseRefName'`。PR が存在しない場合は失敗するため次の判定へ進む) → 現在のブランチの作成記録(`git reflog show <現在のブランチ>` 末尾の `branch: Created from <base>`) → `git rev-parse --abbrev-ref origin/HEAD` またはローカルの main / master(`git rev-parse --verify` で存在確認)、の順で自動判定する
 - 対象パス(0個以上): ドキュメント探索の範囲をこのパス配下に限定する。省略時はリポジトリ全体から自動探索する
 
 ## 実行手順

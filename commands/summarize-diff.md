@@ -1,7 +1,7 @@
 ---
 description: ベースブランチとの差分を要約する
 argument-hint: "--base=<branch>"
-allowed-tools: Bash(git rev-parse:*), Bash(git merge-base:*), Bash(git diff:*), Bash(git log:*), Read, Grep, Glob
+allowed-tools: Bash(git rev-parse:*), Bash(git merge-base:*), Bash(git diff:*), Bash(git log:*), Bash(git reflog:*), Bash(gh pr view:*), Read, Grep, Glob
 ---
 
 # Summarize Diff
@@ -15,21 +15,22 @@ allowed-tools: Bash(git rev-parse:*), Bash(git merge-base:*), Bash(git diff:*), 
 ## 引数仕様(`$ARGUMENTS`)
 
 - `--base=<branch>`: ベースブランチを指定する(例: `--base=main`)。スペース区切りの `--base <branch>` は不可(エラー停止)。
-- 未指定の場合は `git rev-parse --abbrev-ref origin/HEAD` またはローカルの `main` / `master`(`git rev-parse --verify` で存在確認)を自動判定する。判定根拠を出力に明示する。
+- 未指定の場合は、現在ブランチの open PR のベース(`gh pr view --json baseRefName --jq '.baseRefName'`。PR が存在しない場合は失敗するため次の判定へ進む) → 現在のブランチの作成記録(`git reflog show <現在のブランチ>` 末尾の `branch: Created from <base>`) → `git rev-parse --abbrev-ref origin/HEAD` またはローカルの `main` / `master`(`git rev-parse --verify` で存在確認)、の順で自動判定する。判定根拠を出力に明示する。
 - 上記以外の引数が渡された場合はエラー停止し、ユーザーに確認する(推測で進めない)。
 
 ## 実行手順
 
 1. `git rev-parse --is-inside-work-tree` でリポジトリ内であることを確認する。
-2. BASE_BRANCH を決定する(引数 > 自動判定)。決定根拠を明示する。
-3. 現在のブランチ名を取得する。BASE_BRANCH と同一ならエラー停止する。
-4. マージベースを取得する: `git merge-base <BASE_BRANCH> HEAD`。
-5. 変更ファイル一覧を取得する: `git diff --name-status <merge-base>..HEAD`。
-6. 変更行数の概観を取得する: `git diff --stat <merge-base>..HEAD`。
-7. コミット履歴を取得する: `git log --oneline <merge-base>..HEAD`。
-8. 変更量が大きい場合(目安: 1000行超 または 30ファイル超)は、全差分を一度に読まずファイル単位で要点を読む方針に切り替える。
-9. 必要に応じて `Read` / `Grep` / `Glob` で変更ファイルの前後関係(呼び出し元・関連設定)を確認する。
-10. 変更を機能単位にグルーピングし、それぞれの目的・影響範囲を要約する。
+2. 現在のブランチ名を取得する。
+3. BASE_BRANCH を決定する(引数 > 自動判定)。決定根拠を明示する。
+4. BASE_BRANCH と同一ならエラー停止する。
+5. マージベースを取得する: `git merge-base <BASE_BRANCH> HEAD`。
+6. 変更ファイル一覧を取得する: `git diff --name-status <merge-base>..HEAD`。
+7. 変更行数の概観を取得する: `git diff --stat <merge-base>..HEAD`。
+8. コミット履歴を取得する: `git log --oneline <merge-base>..HEAD`。
+9. 変更量が大きい場合(目安: 1000行超 または 30ファイル超)は、全差分を一度に読まずファイル単位で要点を読む方針に切り替える。
+10. 必要に応じて `Read` / `Grep` / `Glob` で変更ファイルの前後関係(呼び出し元・関連設定)を確認する。
+11. 変更を機能単位にグルーピングし、それぞれの目的・影響範囲を要約する。
 
 ## 出力形式
 
