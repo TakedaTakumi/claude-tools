@@ -63,9 +63,16 @@ Phase 0 手順6で取得した `--name-status` と差分本文を入力に、レ
 
 ### Phase 1: Sub Agent への委任（並列）
 
-Phase 0 手順12で確定したレビュアーだけを、担当観点ごとにまとめて**並列に**委任する（各 Agent に 評価モード=`branch`・差分情報・適用観点を渡す）:
+Phase 0 手順12で確定したレビュアーだけを、担当観点ごとにまとめて**並列に**委任する（各 Agent に 評価モード=`branch`・下記の差分ハンドオフ・適用観点を渡す）:
 
 - security 系 → `security-reviewer` / 品質系 → `quality-reviewer` / アーキ → `architecture-reviewer` / DDD → `ddd-reviewer` / テスト → `test-reviewer` / 条件分岐・入力検証 → `logic-reviewer` / 性能・データ → `performance-reviewer` / ops（runtime-config/devenv-quality/ci-quality/observability）→ `ops-reviewer` / 依存 → `dependencies-reviewer` / メタ（documentation/i18n-a11y）→ `meta-reviewer` / 由来（code-provenance）→ `ownership-reviewer`
+
+**差分ハンドオフ（委任プロンプトの規約）** — diff 全文を委任プロンプトに複製しない（Agent 数だけ複製され総トークンが線形に膨らむ）。渡すのは以下だけ:
+
+- コミット範囲 `<merge-base>..HEAD`（手順6）、`--name-status` の一覧、`--stat` のサマリー、大量変更判定（手順10）の結果。
+- **手順8の公開シンボル一覧と手順9の条件式一覧は、起動する全 Agent の委任プロンプトに必ず転記する**（Phase 0 で済んだ抽出を Agent 側で再実行させないため。転記漏れは規約違反）。
+- diff 本文は各 Agent が担当観点に必要な範囲だけ `git diff <merge-base>..HEAD -- <対象パス>` で取得する。security のような横断観点でパスを絞り込めない場合は全体を見てよい（無理な絞り込みによる見落としのほうが損害が大きい）。
+- 同じファイルを複数 Agent が読むことは並列構成上避けられないため許容する。削減対象はメイン側のプロンプト複製と Phase 0 成果の再抽出に限る。
 
 ### Phase 2: 集約とセルフレビュー
 

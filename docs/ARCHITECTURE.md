@@ -36,6 +36,7 @@
 - **段階的開示(Progressive Disclosure)**: メインコンテキストには SKILL.md と必要な観点だけをロード。全観点を一度に読み込まない
 - **関心の分離**: Skill = 観点定義 / Sub Agent = 評価実行 / Slash Command = オーケストレーション
 - **並列性**: 観点グループごとに Sub Agent を**並列**実行(観点数が多くてもコンテキスト枯渇を避ける)
+- **委任は参照渡し**: 委任プロンプトに差分本文を複製せず、コミット範囲と Phase 0 の抽出結果(公開シンボル一覧・条件式一覧)だけを渡す。本文は各 Agent が担当範囲だけ取得する(複製すると総トークンが Agent 数に比例して膨らみ、抽出結果を渡し損ねると Phase 0 と同じ処理が Agent 側で再実行される)
 - **拡張容易性**: 観点の**定義**は1ファイル追加で完結する(本体を他所に分散させない)。ただしカタログ表・観点数表記・担当 Agent・委任ラベルへの同期点は複数ファイルに残るため、機械的に検証できる範囲は `make check`(CI の `sync` ジョブ)で担保する(同期点の削減は中期課題)
 
 ## なぜこの構成か
@@ -50,8 +51,8 @@
 
 1. Slash Command が引数を解析、Phase 0 でベースブランチ決定・差分取得・公開シンボル参照を準備
 2. `security` 観点ファイル(`perspectives/security.md`)と関連テンプレを Skill から確認し、担当 Agent を決定(→ `security-reviewer`)
-3. `security-reviewer` に **`branch` モード + 差分情報 + 適用観点キー** を渡して**並列**起動
-4. Agent は `perspectives/security.md` ＋ 関連テンプレ(`severity-criteria.md` 等)を読み、`output-format.md` の branch 形式で結果を返す
+3. `security-reviewer` に **`branch` モード + 差分ハンドオフ(コミット範囲 `<merge-base>..HEAD`・`--name-status`・`--stat`・Phase 0 の抽出結果) + 適用観点キー** を渡して**並列**起動(diff 全文は複製しない)
+4. Agent は担当観点に必要な範囲だけ `git diff <merge-base>..HEAD -- <対象パス>` で本文を取得し、`perspectives/security.md` ＋ 関連テンプレ(`severity-criteria.md` 等)を読み、`output-format.md` の branch 形式で結果を返す
 5. メインが結果を集約 → セルフレビュー(見落とし / 誤検知・過剰指摘 / 重大度の妥当性 / 観点間の整合 / 影響範囲) → 総評(マージ可否＋必須/推奨/改善＋評価サマリ表＋今回スキップした観点)
 
 `security,supply-chain-attack,performance` のように複数指定すれば、担当 Agent(`security-reviewer` と `performance-reviewer`)が並列に走る。

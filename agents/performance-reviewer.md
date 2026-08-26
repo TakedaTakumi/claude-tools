@@ -16,7 +16,8 @@ tools: Read, Grep, Glob, Bash(git:*), Bash(rg:*)
 ## 入力（メインの Claude から委任される）
 
 - 評価モード: `branch` / `repo` / `slice`
-- 評価対象: 差分情報 / スコープパス・分類 / スライスファイル群
+- 評価対象: `branch` = 差分ハンドオフ（コミット範囲 `<merge-base>..HEAD`・`--name-status`・`--stat`・公開シンボル一覧・条件式一覧・大量変更判定）/ `repo` = スコープパス・分類 / `slice` = スライスファイル群
+- `branch` の diff 本文は渡されない。担当観点に必要な範囲だけ `git diff <merge-base>..HEAD -- <対象パス>` を自分で実行する（絞り込みが困難な横断観点は範囲を狭めず全体を見る）。
 - 適用文脈: 該当する分類または観点指定
 
 ## 評価手順
