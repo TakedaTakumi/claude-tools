@@ -4,7 +4,7 @@
 
 ## 収録ツール
 
-### 汎用コマンド(9個)
+### 汎用コマンド(10個)
 
 | コマンド | 説明 |
 |---|---|
@@ -17,6 +17,7 @@
 | `/review-issue` | 指定した issue 番号の内容を評価する |
 | `/review-pull-request-comment` | PR のコメントを評価する |
 | `/sync-docs` | ブランチでの変更に伴い、影響を受けるドキュメントを特定して更新する |
+| `/visualize` | 指定した資料やトピックを、図と構造で読み解ける HTML にする(用語・根拠・件数を保持) |
 
 ### レビューコマンド(3個)
 
@@ -37,7 +38,7 @@ skills/code-review-perspectives/   # 観点ライブラリ(SKILL.md + perspectiv
 agents/                            # Sub Agent環境
                                    # - 観点レビュアー(12個、*-reviewer.md)
                                    # - ユーティリティエージェント(5個)
-commands/                          # 全12コマンド(汎用9 + レビュー用3、薄いオーケストレータ)
+commands/                          # 全13コマンド(汎用10 + レビュー用3、薄いオーケストレータ)
 config/CLAUDE.md                   # グローバルユーザーメモリ
 docs/                              # ドキュメント
 install.sh / bootstrap.sh          # ~/.claude/ への配置スクリプト
@@ -83,7 +84,7 @@ make check                # 観点ライブラリの同期チェック(CI の sy
 | ローカル開発(コマンドや観点をその場で編集して反映したい) | `./install.sh`(symlink) | リポジトリ更新が即反映 |
 | **VSCode 拡張版 Claude Code** | `./install.sh --copy` | 拡張版がスラッシュコマンドを discovery する際、symlink を辿らずコマンド一覧に出ないことがある |
 | `~/.claude` を別 Docker コンテナにバインドする運用 | `./install.sh --copy` | symlink のターゲットパスはコンテナ内に存在しないため壊れる |
-| `~/.claude` を本リポジトリ以外の用途にも使っている | (通常はそのまま symlink で問題なし) | install.sh は `CLAUDE.md` / `commands/` 配下12ファイル / `agents/` 配下の `*-reviewer.md` 12個 / `skills/code-review-perspectives` 以外には触れない。同名衝突がある場合はガードが効いて確認を求める |
+| `~/.claude` を本リポジトリ以外の用途にも使っている | (通常はそのまま symlink で問題なし) | install.sh は `CLAUDE.md` / `commands/` 配下13ファイル / `agents/` 配下の `*-reviewer.md` 12個 / `skills/code-review-perspectives` 以外には触れない。同名衝突がある場合はガードが効いて確認を求める |
 
 `--copy` で配置した場合、コマンド・観点・Agent・`CLAUDE.md` を編集した後は `./install.sh --copy` の再実行が必要です(symlink では不要)。
 
@@ -117,7 +118,7 @@ curl -fsSL https://raw.githubusercontent.com/TakedaTakumi/claude-tools/main/boot
 
 ## ドキュメント
 
-- [docs/USAGE.md](docs/USAGE.md) — 全12コマンドの使い方・引数・実行例
+- [docs/USAGE.md](docs/USAGE.md) — 全13コマンドの使い方・引数・実行例
 - [docs/MAINTAINER_NOTES.md](docs/MAINTAINER_NOTES.md) — コマンド・観点・Agent 追加/変更/削除時のチェックリスト
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — Skill + Sub Agent + Slash Command の設計
 - [docs/PERSPECTIVES.md](docs/PERSPECTIVES.md) — 34観点のカタログ

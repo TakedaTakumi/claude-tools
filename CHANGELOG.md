@@ -9,6 +9,7 @@
 
 - **Sub Agent** `agents/` に5ファイル追加: coder / coder-hard / researcher / researcher-deep / tester(観点レビュアー12個とは別のユーティリティエージェント。tools は最小権限の原則に従い、コーディング系は Read/Write/Edit + Bash(git:*)、テスト実行を担う tester は Read/Write/Edit + Bash、調査系は Read/Grep/Glob(+WebSearch/WebFetch)で明示指定)
 - **汎用コマンド** `commands/new-issue.md` を追加: 会話の文脈・依頼内容からタイトル・本文を作成し、ユーザーの承認を得たうえで `gh issue create` で issue を作成する(`allowed-tools`: `Bash(git rev-parse:*)`, `Bash(gh issue create:*)`, `Read`, `Grep`, `Glob`)
+- **汎用コマンド** `commands/visualize.md` を追加: 指定した資料やトピックの内容を、専門用語・根拠(ファイルパス・行番号・出典URL・原文引用)・列挙項目の件数を保ったまま、図と構造で読み解ける HTML に組み替える(`allowed-tools`: `Read`, `Grep`, `Glob`, `Write`, `Skill`)
 - **レビュー観点** `input-validation`(不正入力への防御)を追加(33観点から34観点に。`/review-branch` / `/review-slice` に適用、担当は logic-reviewer)
 - `check-sync.sh` を追加: 観点ライブラリの同期不変条件(frontmatter の `key` とファイル名の一致、`SKILL.md` カタログ表の双方向網羅、`docs/PERSPECTIVES.md` の網羅、観点数表記の一致、`applicable_categories_for_repo` と分類マトリクスの三者一致)を検証する。`make check` と CI の `sync` ジョブから実行する
 - **CI** `.github/workflows/check.yml` に `sync` ジョブを追加(観点追加時の同期漏れ検出)。`shellcheck` ジョブの対象に `check-sync.sh` を追加
