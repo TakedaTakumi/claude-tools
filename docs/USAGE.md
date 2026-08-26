@@ -324,23 +324,47 @@ PR 番号を省略する場合(カレントブランチに紐づく PR を使用
 |---|---|---|
 | 第1引数(PERSPECTIVES) | `all` | 観点をカンマ区切り。空 / `all` で適用可能な全観点 |
 | `--base=<branch>` | リモートのデフォルトブランチを自動検出 | 比較先ブランチ |
+| `--preset=<quick\|standard\|full>` | `standard` | 起動するレビュアーの範囲(下記) |
+
+#### プリセット
+
+| プリセット | 起動するレビュアー | 用途 |
+|---|---|---|
+| `quick` | `security-reviewer` / `logic-reviewer` / `quality-reviewer` の3つのみ | 日常のブランチレビュー(最も軽い) |
+| `standard`(既定) | 差分の内容から動的に選抜(下記) | 通常のレビュー |
+| `full` | 適用観点を持つレビュアーを全て起動 | マージ前の最終確認。動的選抜を無効化するエスケープハッチも兼ねる |
+
+#### 動的選抜(`standard`)
+
+差分のファイル一覧と内容から**起動シグナル**を判定し、シグナルが1つも無いレビュアーだけを起動対象から外してコストを下げる。
+
+- `security-reviewer` / `logic-reviewer` / `quality-reviewer` は、実行可能コードの変更がある限り常時起動(スキップ対象外)
+- 判定できないファイル(未知の拡張子・読み取れない命名規約)は起動側に倒す。見落としのほうが無駄な起動より損害が大きいため
+- 非コードのみの差分(`*.md` 等)は `meta-reviewer` のみ起動(シークレット・実行手順の記述があれば `security-reviewer` も起動)
+- 例: テストも実行可能コードも変わっていなければ `test-reviewer` を、依存定義・ロックファイルが変わっていなければ `dependencies-reviewer` を、CI 設定・ランタイム構成・環境変数・ログ関連が変わっていなければ `ops-reviewer` をスキップ
+- スキップした観点と理由は Phase 3 の「今回スキップした観点」節に必ず出力される(黙って観点が落ちることはない)
+- PERSPECTIVES を明示指定した場合、動的選抜は適用しない(明示指定を上書きしないため)。明示指定と `--preset=quick|full` の併用は矛盾しうるため開始前に確認する
+
+判定ルールの一覧は `commands/review-branch.md` の「エージェントの動的選抜」節にある。読むのはオーケストレータのみで、Sub Agent には渡さない。
 
 #### 例
 
 | 入力 | 動作 |
 |---|---|
-| `/review-branch` | 全観点 / base=自動検出 |
+| `/review-branch` | 全観点 / base=自動検出 / 動的選抜あり |
 | `/review-branch security` | security のみ |
 | `/review-branch security,performance` | 複数観点 |
 | `/review-branch --base=develop` | base=develop / 全観点 |
 | `/review-branch security --base=main` | security のみ / base=main |
+| `/review-branch --preset=quick` | security / logic / quality の3レビュアーのみ |
+| `/review-branch --preset=full` | 動的選抜を無効化し、適用観点を持つ全レビュアーを起動 |
 
 #### 流れ
 
-1. **Phase 0**: ベースブランチ決定 → 差分取得 → 公開シンボルの参照箇所収集
+1. **Phase 0**: ベースブランチ決定 → 差分取得 → 公開シンボルの参照箇所収集 → 起動レビュアーの確定
 2. **Phase 1**: 観点を担当 Agent 群に**並列**委任
-3. **Phase 2**: セルフレビュー(15項目)
-4. **Phase 3**: 総評(マージ可否 ✅/⚠️/❌)＋ 必須対応 / 推奨対応 / 改善提案 / 評価サマリ表
+3. **Phase 2**: セルフレビュー(見落とし / 誤検知・過剰指摘 / 重大度の妥当性 / 観点間の整合 / 影響範囲)
+4. **Phase 3**: 総評(マージ可否 ✅/⚠️/❌)＋ 必須対応 / 推奨対応 / 改善提案 / 評価サマリ表 ＋ 今回スキップした観点
 
 ---
 

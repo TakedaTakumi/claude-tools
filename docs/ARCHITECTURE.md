@@ -52,7 +52,7 @@
 2. `security` 観点ファイル(`perspectives/security.md`)と関連テンプレを Skill から確認し、担当 Agent を決定(→ `security-reviewer`)
 3. `security-reviewer` に **`branch` モード + 差分情報 + 適用観点キー** を渡して**並列**起動
 4. Agent は `perspectives/security.md` ＋ 関連テンプレ(`severity-criteria.md` 等)を読み、`output-format.md` の branch 形式で結果を返す
-5. メインが結果を集約 → セルフレビュー15項目 → 総評(マージ可否＋必須/推奨/改善＋評価サマリ表)
+5. メインが結果を集約 → セルフレビュー(見落とし / 誤検知・過剰指摘 / 重大度の妥当性 / 観点間の整合 / 影響範囲) → 総評(マージ可否＋必須/推奨/改善＋評価サマリ表＋今回スキップした観点)
 
 `security,supply-chain-attack,performance` のように複数指定すれば、担当 Agent(`security-reviewer` と `performance-reviewer`)が並列に走る。
 
