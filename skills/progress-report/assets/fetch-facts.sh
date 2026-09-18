@@ -95,6 +95,10 @@ fetch_pr() {
     # - イベントが1件も見つからない場合(最初からDraftではなかったPRなど)
     # のいずれも、ここでは Draft ではないと分かっているため PR の createdAt にフォールバックする。
     local gqlResult readyAtValue
+    # query内の $owner/$name/$number はGraphQL変数のプレースホルダーであり、シェル変数
+    # ではない。ダブルクォートにするとシェルが展開してクエリが壊れるため、シングルクォート
+    # のまま抑制する。
+    # shellcheck disable=SC2016
     if gqlResult="$(gh api graphql -f query='
       query($owner:String!,$name:String!,$number:Int!) {
         repository(owner:$owner, name:$name) {
@@ -261,6 +265,10 @@ if [ -n "${PARENT_REPO}" ] && [ -n "${PARENT_ISSUE}" ] && [ "${PARENT_ISSUE}" !=
   PARENT_OWNER="${PARENT_REPO%%/*}"
   PARENT_NAME="${PARENT_REPO##*/}"
 
+  # query内の $owner/$name/$number はGraphQL変数のプレースホルダーであり、シェル変数
+  # ではない。ダブルクォートにするとシェルが展開してクエリが壊れるため、シングルクォート
+  # のまま抑制する。
+  # shellcheck disable=SC2016
   if PARENT_GQL="$(gh api graphql -f query='
       query($owner:String!,$name:String!,$number:Int!) {
         repository(owner:$owner, name:$name) {
