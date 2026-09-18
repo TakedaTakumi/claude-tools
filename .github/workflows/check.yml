@@ -34,6 +34,8 @@ jobs:
               --include='*.sh' \
               --include='*.yml' \
               --include='*.yaml' \
+              --include='*.html' \
+              --include='*.json' \
               . || status=$?
           case "$status" in
             0)
@@ -58,7 +60,7 @@ jobs:
       - name: install shellcheck
         run: sudo apt-get update && sudo apt-get install -y shellcheck
       - name: run
-        run: shellcheck install.sh bootstrap.sh check-sync.sh
+        run: shellcheck install.sh bootstrap.sh check-sync.sh skills/progress-report/assets/fetch-facts.sh
 
   # 観点ライブラリの同期漏れ検出。観点追加時の更新箇所(カタログ表・観点数表記・
   # 分類マトリクス)は散在しており、一部だけ更新された状態は目視では気付けない。
