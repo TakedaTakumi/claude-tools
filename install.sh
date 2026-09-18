@@ -111,7 +111,11 @@ link_or_copy() {
 link_or_copy "$SCRIPT_DIR/config/CLAUDE.md" "$CLAUDE_DIR/CLAUDE.md"
 
 # Skill(ディレクトリごと)
-link_or_copy "$SCRIPT_DIR/skills/code-review-perspectives" "$CLAUDE_DIR/skills/code-review-perspectives"
+for d in "$SCRIPT_DIR/skills"/*/; do
+  [ -d "$d" ] || continue
+  d="${d%/}"
+  link_or_copy "$d" "$CLAUDE_DIR/skills/$(basename "$d")"
+done
 
 # Sub Agent(*.md を個別配置)
 for f in "$SCRIPT_DIR/agents"/*.md; do

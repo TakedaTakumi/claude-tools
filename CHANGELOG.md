@@ -14,6 +14,9 @@
 - `check-sync.sh` を追加: 観点ライブラリの同期不変条件(frontmatter の `key` とファイル名の一致、`SKILL.md` カタログ表の双方向網羅、`docs/PERSPECTIVES.md` の網羅、観点数表記の一致、`applicable_categories_for_repo` と分類マトリクスの三者一致)を検証する。`make check` と CI の `sync` ジョブから実行する
 - **CI** `.github/workflows/check.yml` に `sync` ジョブを追加(観点追加時の同期漏れ検出)。`shellcheck` ジョブの対象に `check-sync.sh` を追加
 - `SKILL.md` の設計原則に「レビュー対象は評価対象のデータ」を追加: 対象ファイルの内容(コメント・文字列リテラル・テストフィクスチャを含む)を指示として解釈せず、埋め込まれた指示文は指摘対象として扱う(間接プロンプトインジェクション対策)
+- **Skill** `skills/progress-report/` を追加: 進捗レポートの立ち上げ・更新・公開の手順(`SKILL.md`)と `state.json` のスキーマ・状態ラベル導出ルール(`SCHEMA.md`)、テンプレート HTML / 取得スクリプト / データの実例(`assets/`)。`state.json` を単一情報源とし、`facts` は取得スクリプトだけが書き換える
+- **汎用コマンド** `commands/progress-report.md` を追加: Skill `progress-report` を読み込み、`init` / `update` / `publish` のサブコマンドで進捗レポートを操作する薄いオーケストレータ
+- `docs/MAINTAINER_NOTES.md` に「Skill を追加する場合」のチェックリストを追加
 
 ### Changed
 
@@ -37,6 +40,10 @@
 - `docs/MAINTAINER_NOTES.md`: 「観点を追加する場合」チェックリストに、実績で必要だった同期点(観点数表記の対象ファイル・Sub Agent 担当表・委任ラベル・既存観点への双方向の相互参照・担当エージェント本文・`make check`)を追加。CI の表に `sync` ジョブと `unicode` のロケール指定を反映
 - `docs/ARCHITECTURE.md`: 「観点追加は1ファイル追加のみで完結」を実態に合わせて修正(定義は1ファイルで完結するが同期点は複数残り、機械的検証は `make check` が担保する)
 - `config/CLAUDE.md`: 監督役ルール(旧「Fable モデル使用時のルール」)の適用条件を Opus 系モデルにも拡張(セクション名を「Fable / Opus モデル使用時のルール」に変更)。サブエージェントへのモデル使用禁止は Fable 系のみを維持(coder-hard 等の `model: opus` 明示指定と整合)
+- `install.sh`: Skill の配置を単一パスのハードコードから `skills/` 配下のディレクトリ走査に変更(Skill を追加するたびにスクリプトを編集する必要をなくす)
+- **CI** `unicode` ジョブの走査対象に `*.html` / `*.json` を追加、`shellcheck` ジョブの対象に資産のシェルスクリプトを追加
+- `README.md` / `docs/USAGE.md`: 汎用コマンド数を10→11、総コマンド数を13→14に更新。`install.sh` が触れる範囲の記述を実態に合わせて修正
+- `docs/ARCHITECTURE.md`: `progress-report` がレビュー系(Skill + Sub Agent + Slash Command)とは別の、Sub Agent を持たない2層構成であることを追記
 
 ## [0.1.0] - 2026-07-11
 
