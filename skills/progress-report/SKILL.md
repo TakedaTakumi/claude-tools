@@ -28,17 +28,26 @@ description: 進捗レポートの作成・更新・公開の手順。state.json
 
 ## 手順2: 更新(update)
 
-1. 取得スクリプトを実行して `facts` を最新化する: `bash ~/.claude/skills/progress-report/assets/fetch-facts.sh <state.jsonへのパス>`
-2. 人が書く欄を見直す: `meta.asOf` / `headline` / `forecast` / `asks` / `watchItems`
-3. `forecast` を変更した場合は `forecastLog[]` に追記する
-4. `facts` を手で編集しない
+1. `state.json` を一時ファイル(例: `state.json.new`)にコピーする
+2. 配置先の `fetch-facts.sh` を一時ファイルに対して実行し、`facts` を最新化する:
+   `bash <配置先>/assets/fetch-facts.sh <一時ファイルへのパス>`
+   (配置先は既定 `~/.claude/skills/progress-report/assets/`。`CLAUDE_DIR` を変更している
+   環境ではその配下を使う。固定パスをそのまま書かない)
+3. 一時ファイルの `facts` と元の `state.json` の差分をユーザーに提示し、承認を得る
+   (承認前に元の `state.json` は書き換えない)
+4. 承認後、一時ファイルを `state.json` に置き換える
+5. 人が書く欄を見直す: `meta.asOf` / `headline` / `forecast` / `asks` / `watchItems`
+6. `forecast` を変更した場合は `forecastLog[]` に追記する
+7. `facts` を手で編集しない
 
 ## 手順3: 公開(publish)
 
-1. テンプレートHTML(`report-template.html`)を本体、`state.json` を補助ファイルとしてアーティファクトに公開する
+1. `Artifact` ツールで、テンプレートHTML(`report-template.html`)を本体(`file_path`)、
+   `state.json` を補助ファイル(`files`)としてアーティファクトに公開する
 2. テンプレートに `<title>` が無いため、公開時にページ名(`meta.title`)を渡す
-3. 公開後のURLを `meta.artifactUrl` に記録する
-4. 2回目以降は `meta.artifactUrl` から既存アーティファクトを特定し、同じURLを更新する(新規作成しない)
+3. `Artifact` ツールの publish 結果に含まれるURLを `meta.artifactUrl` に記録する
+4. 2回目以降は `meta.artifactUrl` を `Artifact` ツールの `url` 引数に渡して同じ
+   アーティファクトを更新する(`url` を省略すると新規作成になるため省略しない)
 
 ## 注意
 

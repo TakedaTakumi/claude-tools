@@ -379,11 +379,28 @@ table.tbl td.num,table.tbl th.num{font-family:var(--mono);font-variant-numeric:t
   /** true / "true" のみ真とみなす */
   function TRUE(v) { return v === true || v === "true"; }
 
-  /** 日付文字列 -> epoch ms（不正なら null） */
+  /** y/mo/dがカレンダー上実在する日付か(2026-02-30等を弾く) */
+  function isValidCalendarDate(y, mo, d) {
+    var dt = new Date(Date.UTC(y, mo - 1, d));
+    return dt.getUTCFullYear() === y && dt.getUTCMonth() === mo - 1 && dt.getUTCDate() === d;
+  }
+  /**
+   * 日付文字列 -> epoch ms(不正なら null)。
+   * SCHEMA.md が定める YYYY-MM-DD、または ISO 8601 UTC(Z終端)のみを受け付ける。
+   * Date.parse は 2026-02-30 のような不正日付を正規化してしまうため使わない。
+   */
   function parseMs(v) {
     var s = S(v);
     if (!s) return null;
-    var ms = Date.parse(s);
+    var m = /^(\d{4})-(\d{2})-(\d{2})(?:[T ](\d{2}):(\d{2}):(\d{2})(?:\.\d+)?Z)?$/.exec(s);
+    if (!m) return null;
+    var y = parseInt(m[1], 10), mo = parseInt(m[2], 10), d = parseInt(m[3], 10);
+    if (mo < 1 || mo > 12 || d < 1 || d > 31 || !isValidCalendarDate(y, mo, d)) return null;
+    var hh = m[4] ? parseInt(m[4], 10) : 0;
+    var mi = m[5] ? parseInt(m[5], 10) : 0;
+    var ss = m[6] ? parseInt(m[6], 10) : 0;
+    if (hh > 23 || mi > 59 || ss > 59) return null;
+    var ms = Date.UTC(y, mo - 1, d, hh, mi, ss);
     return isFinite(ms) ? ms : null;
   }
   /** UTC 基準の通日番号。日付だけ/日時混在でも一貫して差分が取れる */
@@ -801,7 +818,7 @@ table.tbl td.num,table.tbl th.num{font-family:var(--mono);font-variant-numeric:t
       add(flow, col);
     });
     add(wrap, flow);
-    var sec = section("4パートの状態", wrap);
+    var sec = section(m.parts.length + "パートの状態", wrap);
     if (sec) sec.className = "sec front";
     return sec;
   }
@@ -847,6 +864,42 @@ table.tbl td.num,table.tbl th.num{font-family:var(--mono);font-variant-numeric:t
     return section("注意している点", box);
   }
 
+  var SVG_ALLOWED_TAGS = {
+    svg: 1, g: 1, path: 1, rect: 1, circle: 1, ellipse: 1, line: 1,
+    polyline: 1, polygon: 1, text: 1, tspan: 1, defs: 1, marker: 1,
+    use: 1, title: 1, desc: 1
+  };
+  /** SVG文字列を許可リスト方式でサニタイズする。パース不能/svg以外のルートは null */
+  function sanitizeSvg(svgString) {
+    var doc;
+    try {
+      doc = new DOMParser().parseFromString(String(svgString), "image/svg+xml");
+    } catch (e) {
+      return null;
+    }
+    if (doc.querySelector("parsererror")) return null;
+    var root = doc.documentElement;
+    if (!root || root.tagName.toLowerCase() !== "svg") return null;
+    sanitizeSvgNode(root);
+    return root;
+  }
+  function sanitizeSvgNode(node) {
+    Array.prototype.slice.call(node.childNodes).forEach(function (child) {
+      if (child.nodeType === 8) { node.removeChild(child); return; }
+      if (child.nodeType !== 1) return;
+      var tag = child.tagName.toLowerCase();
+      if (!SVG_ALLOWED_TAGS[tag]) { node.removeChild(child); return; }
+      Array.prototype.slice.call(child.attributes).forEach(function (attr) {
+        var name = attr.name.toLowerCase();
+        if (/^on/.test(name)) { child.removeAttribute(attr.name); return; }
+        if ((name === "href" || name === "xlink:href") && /^\s*javascript:/i.test(attr.value)) {
+          child.removeAttribute(attr.name);
+        }
+      });
+      sanitizeSvgNode(child);
+    });
+  }
+
   function renderDiagram(m) {
     var svg = m.detail.diagramSvg;
     if (!svg) return null;
@@ -854,8 +907,8 @@ table.tbl td.num,table.tbl th.num{font-family:var(--mono);font-variant-numeric:t
     var inner = h("div");
     inner.style.padding = "12px";
     inner.style.minWidth = "max-content";
-    // 図版のみ innerHTML を許可（スキーマ上の例外）。script だけは落とす。
-    inner.innerHTML = svg.replace(/<script[\s\S]*?<\/script\s*>/gi, "");
+    var sanitized = sanitizeSvg(svg);
+    if (sanitized) inner.appendChild(document.importNode(sanitized, true));
     add(box, inner);
     return section("構成と処理の流れ", box);
   }

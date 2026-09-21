@@ -1,7 +1,7 @@
 ---
 description: 進捗レポートを立ち上げ・更新・公開する
 argument-hint: "<init|update|publish> [--dir=<path>] [--title=<name>]"
-allowed-tools: Read, Write, Edit, Glob, Skill
+allowed-tools: Read, Write, Edit, Glob, Skill, Artifact
 ---
 
 # Progress Report

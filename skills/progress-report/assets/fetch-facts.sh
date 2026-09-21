@@ -61,6 +61,7 @@ PRS_JSON="${WORKDIR}/prs.json"
 ISSUES_JSON="${WORKDIR}/issues.json"
 echo "[]" > "${PRS_JSON}"
 echo "[]" > "${ISSUES_JSON}"
+FAILED_COUNT=0
 
 # ---------------------------------------------------------------------------
 # PR一件を取得して PRS_JSON に追記する
@@ -244,11 +245,11 @@ while IFS= read -r target; do
   fi
 
   if [ -n "${prNum}" ] && [ "${prNum}" != "null" ]; then
-    fetch_pr "${partId}" "${repo}" "${prNum}" || true
+    fetch_pr "${partId}" "${repo}" "${prNum}" || FAILED_COUNT=$((FAILED_COUNT + 1))
   fi
 
   if [ -n "${issueNum}" ] && [ "${issueNum}" != "null" ]; then
-    fetch_issue "${partId}" "${repo}" "${issueNum}" || true
+    fetch_issue "${partId}" "${repo}" "${issueNum}" || FAILED_COUNT=$((FAILED_COUNT + 1))
   fi
 done < <(jq -c '.[]' <<<"${TARGETS_JSON}")
 
@@ -281,6 +282,7 @@ if [ -n "${PARENT_REPO}" ] && [ -n "${PARENT_ISSUE}" ] && [ "${PARENT_ISSUE}" !=
   else
     echo "警告: 親issueのsub-issue進捗取得に失敗しました (repo=${PARENT_REPO}, issue=${PARENT_ISSUE})" >&2
     SUB_ISSUE_PROGRESS="null"
+    FAILED_COUNT=$((FAILED_COUNT + 1))
   fi
 else
   echo "情報: meta.parent が未設定のため、sub-issue進捗の取得はスキップします" >&2
@@ -290,6 +292,11 @@ fi
 # facts を組み立てて state.json に書き戻す
 #   一時ファイルに書いてからmvすることで、途中失敗時に元ファイルを壊さないようにする。
 # ---------------------------------------------------------------------------
+
+if [ "${FAILED_COUNT}" -gt 0 ]; then
+  echo "エラー: ${FAILED_COUNT}件の取得に失敗したため、state.json は更新しません(既存の内容を保持します)" >&2
+  exit 1
+fi
 
 GENERATED_AT="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 
