@@ -1,0 +1,272 @@
+{
+  "meta": {
+    "title": "お知らせ通知機能",
+    "asOf": "2026-01-13",
+    "oneLiner": "アプリ内のお知らせをメールでも受け取れるように、通知設定を追加する機能",
+    "artifactUrl": "",
+    "targets": [
+      {
+        "partId": 1,
+        "repo": "example-org/example-infra",
+        "issue": 101,
+        "pr": 201
+      },
+      {
+        "partId": 2,
+        "repo": "example-org/example-api",
+        "issue": 102,
+        "pr": 202
+      },
+      {
+        "partId": 3,
+        "repo": "example-org/example-web",
+        "issue": 103,
+        "pr": 203
+      }
+    ],
+    "parent": {
+      "repo": "example-org/example-web",
+      "issue": 100
+    }
+  },
+  "headline": "基盤とAPIの実装が完了。画面の接続確認が残っている",
+  "forecast": {
+    "earliest": "2026-01-20",
+    "latest": "2026-01-27",
+    "riskCondition": "example-api#202のレビューが1/16までに終わらない場合",
+    "assumptions": [
+      "レビューが1件あたり1〜2営業日で回ること",
+      "メール配信基盤の送信テストで大きな設定変更が発生しないこと",
+      "画面側の接続確認で仕様の見直しが発生しないこと"
+    ]
+  },
+  "asks": [
+    {
+      "what": "example-infra#201 の承認",
+      "by": "2026-01-14",
+      "who": ""
+    },
+    {
+      "what": "example-api#202 のレビュー依頼への対応",
+      "by": "2026-01-16",
+      "who": ""
+    }
+  ],
+  "parts": [
+    {
+      "id": 1,
+      "name": "インフラ",
+      "what": "メールを配信するための基盤を用意する",
+      "dependsOn": [],
+      "next": "承認 → 反映",
+      "forecast": {
+        "earliest": "2026-01-14",
+        "latest": "2026-01-16"
+      },
+      "basis": "内容が確定し自動チェックも通過済み。承認されれば自動で開発環境に反映される"
+    },
+    {
+      "id": 2,
+      "name": "API",
+      "what": "通知設定の保存と、配信を依頼するための窓口を追加する",
+      "dependsOn": [],
+      "next": "レビュー → マージ",
+      "forecast": {
+        "earliest": "2026-01-14",
+        "latest": "2026-01-19"
+      },
+      "basis": "テストを含めて実装済みで、自動テストは全て通過。レビュー待ちの状態"
+    },
+    {
+      "id": 3,
+      "name": "画面",
+      "what": "通知設定のオンオフと、送信履歴の表示を追加する",
+      "dependsOn": [
+        1,
+        2
+      ],
+      "next": "1・2 の完了後に接続確認",
+      "forecast": {
+        "earliest": "2026-01-20",
+        "latest": "2026-01-27"
+      },
+      "basis": "1・2の完了が前提。実際の基盤につないでの動作確認がここで初めて可能になる"
+    }
+  ],
+  "watchItems": [
+    {
+      "title": "開発環境に反映するまで、メールの到達までにかかる時間が実測できない",
+      "impact": "想定より遅延する可能性。設定画面の表示には影響しない見込み",
+      "action": "パート3の確認時に実測する",
+      "affectsSchedule": true
+    },
+    {
+      "title": "3件のサブ課題と提出物が自動で連動していない",
+      "impact": "提出物が取り込まれても課題が自動的に閉じず、進捗表示が0%のまま残る",
+      "action": "手動で閉じるか、連動の設定を追加する",
+      "affectsSchedule": false
+    },
+    {
+      "title": "送信失敗時の再送方針が未確定",
+      "impact": "失敗したメールが再送されず、利用者に通知が届かない可能性",
+      "action": "パート1の反映後に方針を決める",
+      "affectsSchedule": true
+    }
+  ],
+  "detail": {
+    "featureDescription": [
+      "通知設定はデータベースに保存し、オン/オフの状態と通知先メールアドレスを持たせる",
+      "配信はメール配信基盤を通じて行い、送信結果を履歴として保存する",
+      "画面では設定のオン/オフ切り替えと、直近の送信履歴の一覧を表示する"
+    ],
+    "diagramSvg": "<svg viewBox=\"0 0 860 300\" role=\"img\" aria-label=\"ブラウザ・API・メール配信基盤の間の処理の流れ\">\n        <rect x=\"16\" y=\"10\" width=\"140\" height=\"40\" rx=\"3\" fill=\"var(--ground)\" stroke=\"var(--line)\"/>\n        <text x=\"86\" y=\"35\" text-anchor=\"middle\" font-size=\"13\" font-family=\"var(--display)\" font-weight=\"700\" fill=\"var(--ink)\">ブラウザ</text>\n        <rect x=\"350\" y=\"10\" width=\"140\" height=\"40\" rx=\"3\" fill=\"var(--ground)\" stroke=\"var(--accent)\"/>\n        <text x=\"420\" y=\"35\" text-anchor=\"middle\" font-size=\"13\" font-family=\"var(--display)\" font-weight=\"700\" fill=\"var(--accent)\">API</text>\n        <rect x=\"684\" y=\"10\" width=\"160\" height=\"40\" rx=\"3\" fill=\"var(--ground)\" stroke=\"var(--line)\"/>\n        <text x=\"764\" y=\"35\" text-anchor=\"middle\" font-size=\"12.5\" font-family=\"var(--mono)\" font-weight=\"600\" fill=\"var(--ink)\">メール配信基盤</text>\n\n        <line x1=\"86\" y1=\"54\" x2=\"86\" y2=\"250\" stroke=\"var(--line)\" stroke-width=\"1\" stroke-dasharray=\"3 4\"/>\n        <line x1=\"420\" y1=\"54\" x2=\"420\" y2=\"250\" stroke=\"var(--accent)\" stroke-width=\"1.5\" stroke-dasharray=\"3 4\"/>\n        <line x1=\"764\" y1=\"54\" x2=\"764\" y2=\"250\" stroke=\"var(--line)\" stroke-width=\"1\" stroke-dasharray=\"3 4\"/>\n\n        <defs>\n          <marker id=\"ah\" viewBox=\"0 0 10 10\" refX=\"9\" refY=\"5\" markerWidth=\"7\" markerHeight=\"7\" orient=\"auto-start-reverse\">\n            <path d=\"M0 0 L10 5 L0 10 z\" fill=\"var(--muted)\"/>\n          </marker>\n        </defs>\n\n        <text x=\"253\" y=\"88\" text-anchor=\"middle\" font-size=\"12\" font-family=\"var(--body)\" fill=\"var(--muted)\">① 通知設定を保存</text>\n        <line x1=\"88\" y1=\"98\" x2=\"418\" y2=\"98\" stroke=\"var(--muted)\" stroke-width=\"1.6\" marker-end=\"url(#ah)\"/>\n\n        <text x=\"592\" y=\"138\" text-anchor=\"middle\" font-size=\"12\" font-family=\"var(--body)\" fill=\"var(--muted)\">② 配信を依頼</text>\n        <line x1=\"422\" y1=\"148\" x2=\"762\" y2=\"148\" stroke=\"var(--muted)\" stroke-width=\"1.6\" marker-end=\"url(#ah)\"/>\n\n        <text x=\"592\" y=\"188\" text-anchor=\"middle\" font-size=\"12\" font-family=\"var(--body)\" fill=\"var(--muted)\">③ 送信結果を返す</text>\n        <line x1=\"762\" y1=\"198\" x2=\"422\" y2=\"198\" stroke=\"var(--muted)\" stroke-width=\"1.6\" marker-end=\"url(#ah)\"/>\n      </svg>",
+    "spec": [
+      {
+        "k": "配信方式",
+        "v": "メール配信基盤経由の非同期送信(即時反映はしない)"
+      },
+      {
+        "k": "保存先",
+        "v": "既存の設定テーブルに通知種別ごとのオン/オフを追加(新規テーブルなし)"
+      },
+      {
+        "k": "制約",
+        "v": "1利用者あたりの送信頻度に上限を設け、短時間の連続送信を抑止する"
+      }
+    ],
+    "branches": [
+      {
+        "repo": "example-org/example-infra",
+        "nodes": [
+          {
+            "name": "main",
+            "kind": "trunk",
+            "depth": 0,
+            "pr": null,
+            "prUrl": "",
+            "note": ""
+          },
+          {
+            "name": "feature/notification-mail-infra",
+            "kind": "work",
+            "depth": 1,
+            "pr": 201,
+            "prUrl": "https://github.com/example-org/example-infra/pull/201",
+            "note": ""
+          }
+        ]
+      },
+      {
+        "repo": "example-org/example-api",
+        "nodes": [
+          {
+            "name": "develop",
+            "kind": "trunk",
+            "depth": 0,
+            "pr": null,
+            "prUrl": "",
+            "note": ""
+          },
+          {
+            "name": "feature/notification-settings-api",
+            "kind": "work",
+            "depth": 1,
+            "pr": 202,
+            "prUrl": "https://github.com/example-org/example-api/pull/202",
+            "note": ""
+          }
+        ]
+      },
+      {
+        "repo": "example-org/example-web",
+        "nodes": [
+          {
+            "name": "main",
+            "kind": "trunk",
+            "depth": 0,
+            "pr": null,
+            "prUrl": "",
+            "note": ""
+          },
+          {
+            "name": "release/notification-feature",
+            "kind": "release",
+            "depth": 1,
+            "pr": null,
+            "prUrl": "",
+            "note": "統合PRは未作成"
+          },
+          {
+            "name": "feat/103-notification-settings-ui",
+            "kind": "work",
+            "depth": 2,
+            "pr": 203,
+            "prUrl": "https://github.com/example-org/example-web/pull/203",
+            "note": ""
+          }
+        ]
+      }
+    ],
+    "planDiff": [
+      {
+        "title": "API: 送信頻度の上限チェックを追加",
+        "body": [
+          "レビューで「短時間に設定を変更した場合、メールが連続で送られてしまう」との指摘があり、送信頻度の上限チェックを追加して対応した。",
+          "当初計画にはなかった項目のため、実装量がやや増えている。"
+        ]
+      }
+    ],
+    "remaining": [
+      "example-infra#201のレビュー承認 → マージ(CIがdevに自動apply)",
+      "example-api#202のレビュー → マージ(develop)",
+      "example-web#203のレビュー → マージ。dev環境でメール配信基盤との結合確認(送信・履歴表示)",
+      "release/notification-feature → main の統合PR作成・マージ",
+      "サブ課題3件のクローズと親課題#100のクローズ"
+    ],
+    "links": [
+      {
+        "label": "親課題",
+        "url": "https://github.com/example-org/example-web/issues/100"
+      },
+      {
+        "label": "サブ課題: example-infra#101",
+        "url": "https://github.com/example-org/example-infra/issues/101"
+      },
+      {
+        "label": "サブ課題: example-api#102",
+        "url": "https://github.com/example-org/example-api/issues/102"
+      },
+      {
+        "label": "サブ課題: example-web#103",
+        "url": "https://github.com/example-org/example-web/issues/103"
+      },
+      {
+        "label": "実装計画",
+        "url": ".plan/2026-01-05-notification-feature.md"
+      }
+    ]
+  },
+  "forecastLog": [
+    {
+      "asOf": "2026-01-06",
+      "earliest": "2026-01-16",
+      "latest": "2026-01-23"
+    },
+    {
+      "asOf": "2026-01-13",
+      "earliest": "2026-01-20",
+      "latest": "2026-01-27"
+    }
+  ],
+  "facts": {
+    "generatedAt": "",
+    "prs": [],
+    "issues": [],
+    "parent": {
+      "subIssueProgress": {
+        "total": 3,
+        "completed": 0
+      }
+    }
+  }
+}

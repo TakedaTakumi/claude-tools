@@ -88,3 +88,27 @@
 - ユーザーは依然として `/review-branch` のような**明示呼び出し**を期待する
 - Skill だけでは auto-invocation の不確実性がある(ユースケースが曖昧だと発火しない)
 - 軽量化された Slash Command(各100行以下)はオーケストレータとして最小限の役割を持つ
+
+## Skill + Slash Command の2層構成(progress-report)
+
+レビュー系は Skill + Sub Agent + Slash Command の構成を取るが、`progress-report` は
+Sub Agent を持たない2層構成を取る。
+
+```
+Slash Command: /progress-report(入口)
+  - 引数パース(init / update / publish)
+  - Skill の読み込みと手順の実行
+  - 書き換え・公開前の承認取得
+        │ 参照
+        ▼
+Skill: progress-report(資産)
+  SKILL.md   — 立ち上げ・更新・公開の手順
+  SCHEMA.md  — state.json のキー構成と状態ラベルの導出ルール
+  assets/    — テンプレート HTML / 取得スクリプト / データの実例
+```
+
+| 判断 | 理由 |
+|---|---|
+| Sub Agent を持たない | 評価ではなく決まった手順の実行であり、並列化・コンテキスト分離の利点が無い |
+| 手順とスキーマを分離 | 手順の更新頻度とスキーマの更新頻度が異なる。SKILL.md にスキーマを複製しない |
+| facts の書き換えを取得スクリプトに限定 | 人が書く欄と機械が書く欄を分けることで、更新時にどちらを見直すかが一意に決まる |

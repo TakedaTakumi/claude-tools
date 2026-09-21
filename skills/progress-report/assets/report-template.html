@@ -1,0 +1,1473 @@
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@500;700&family=Noto+Sans+JP:wght@400;500&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+/* ===== design tokens : light を素の :root に全定義する ===== */
+/* state.json の detail.diagramSvg から参照してよい色・書体トークンは次のみ：
+   --ground / --surface / --ink / --muted / --line / --accent / --ok / --wait / --risk / --idle / --wip
+   / --display / --body / --mono 。ここに無い名前を図で使うと var() が無効値になり表示されない。 */
+:root{
+  --ground:#F5F6F4;
+  --surface:#FFFFFF;
+  --ink:#17212B;
+  --muted:#5C6771;
+  --line:#DFE3DF;
+  --accent:#0F6E62;
+  --ok:#2E7D51;
+  --wait:#B06A00;
+  --risk:#B3261E;
+  --idle:#8A9299;
+  /* tone: wip は accent を流用（アクセント寄りの進行中色） */
+  --wip:var(--accent);
+  --display:"Zen Kaku Gothic New","Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif;
+  --body:"Noto Sans JP","Hiragino Sans","Yu Gothic",Meiryo,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Consolas,monospace;
+  --radius:10px;
+  --shadow:0 1px 2px rgba(23,33,43,.06),0 1px 10px rgba(23,33,43,.04);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#12171B;
+    --surface:#1A2027;
+    --ink:#E6EAEC;
+    --muted:#9AA5AD;
+    --line:#2A333B;
+    --accent:#5FC9B8;
+    --ok:#58C08A;
+    --wait:#E2A245;
+    --risk:#F08A80;
+    --idle:#7C858C;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 1px 10px rgba(0,0,0,.25);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#12171B;
+  --surface:#1A2027;
+  --ink:#E6EAEC;
+  --muted:#9AA5AD;
+  --line:#2A333B;
+  --accent:#5FC9B8;
+  --ok:#58C08A;
+  --wait:#E2A245;
+  --risk:#F08A80;
+  --idle:#7C858C;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 1px 10px rgba(0,0,0,.25);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--ground);
+  color:var(--ink);
+  font-family:var(--body);
+  font-weight:400;
+  line-height:1.7;
+  -webkit-font-smoothing:antialiased;
+  font-feature-settings:"palt" 1;
+  overflow-x:hidden;
+}
+a{color:var(--accent);text-underline-offset:2px;text-decoration-thickness:1px}
+a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+.mono,.num{font-family:var(--mono);font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.wrap{max-width:1040px;margin-inline:auto;padding-inline:16px;padding-block:0 72px}
+@media (min-width:640px){.wrap{padding-inline:24px}}
+
+/* ===== masthead ===== */
+.masthead{
+  position:sticky;top:env(safe-area-inset-top,0px);z-index:30;
+  background:var(--ground);border-bottom:1px solid var(--line);
+}
+.masthead-in{
+  max-width:1040px;margin-inline:auto;padding-inline:16px;padding-block:10px;
+  display:flex;flex-wrap:wrap;gap:2px 14px;align-items:baseline;
+}
+@media (min-width:640px){.masthead-in{padding-inline:24px}}
+.masthead h1{
+  margin:0;font-family:var(--display);font-weight:700;letter-spacing:.01em;
+  font-size:clamp(15px,2.2vw,19px);line-height:1.35;
+}
+.masthead .asof{font-family:var(--mono);font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+
+/* ===== 前半（密度重視） ===== */
+.lede{padding-block:22px 6px}
+.headline{
+  margin:0 0 6px;font-family:var(--display);font-weight:700;
+  font-size:clamp(23px,5.6vw,40px);line-height:1.3;letter-spacing:.005em;
+}
+.oneliner{margin:0;color:var(--muted);font-size:clamp(13px,2.4vw,15px)}
+
+.grid2{display:grid;grid-template-columns:1fr;gap:12px;margin-block:18px 0}
+@media (min-width:760px){.grid2{grid-template-columns:1.15fr .85fr}}
+
+.card{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+  padding-inline:14px;padding-block:12px 14px;box-shadow:var(--shadow);
+}
+.card-h{
+  margin:0 0 8px;font-family:var(--display);font-weight:500;font-size:12px;letter-spacing:.09em;
+  color:var(--muted);text-transform:none;
+}
+.range{display:flex;flex-wrap:wrap;gap:6px 20px;align-items:flex-end}
+.range-item{display:flex;flex-direction:column;gap:1px}
+.range-k{font-size:11px;color:var(--muted);letter-spacing:.06em}
+.range-v{font-family:var(--mono);font-weight:600;font-size:clamp(16px,3.4vw,21px);font-variant-numeric:tabular-nums}
+.range-sep{align-self:center;color:var(--idle);padding-block:0 2px}
+.riskline{
+  margin-top:10px;padding-inline:10px;padding-block:7px;border-radius:8px;
+  border:1px solid color-mix(in srgb,var(--risk) 38%,var(--line));
+  background:color-mix(in srgb,var(--risk) 8%,var(--surface));
+  font-size:12.5px;line-height:1.6;
+}
+.riskline b{color:var(--risk);font-weight:500;font-size:11px;letter-spacing:.06em;display:block}
+.assump{margin:8px 0 0;padding-left:1.1em;color:var(--muted);font-size:12px;line-height:1.65}
+.assump li{margin-block:2px}
+
+.asks{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.ask{display:flex;flex-wrap:wrap;gap:4px 8px;align-items:baseline;padding-block:0 8px;border-bottom:1px dashed var(--line)}
+.ask:last-child{border-bottom:0;padding-bottom:0}
+.ask-what{flex:1 1 auto;min-width:0;font-size:13.5px;font-weight:500}
+.ask-by{
+  font-family:var(--mono);font-size:11.5px;font-variant-numeric:tabular-nums;
+  color:var(--wait);border:1px solid color-mix(in srgb,var(--wait) 40%,var(--line));
+  background:color-mix(in srgb,var(--wait) 9%,var(--surface));
+  border-radius:999px;padding-inline:7px;padding-block:1px;white-space:nowrap;
+}
+.ask-who{font-size:11.5px;color:var(--muted);white-space:nowrap}
+
+/* ===== フロー図 ===== */
+.flowwrap{overflow-x:auto;margin-block:18px 0;padding-block:2px 4px;-webkit-overflow-scrolling:touch}
+.flow{display:flex;flex-direction:column;gap:8px;align-items:stretch;min-width:0}
+@media (min-width:760px){.flow{flex-direction:row;align-items:stretch;min-width:max-content}}
+.flow-col{display:flex;flex-direction:column;gap:8px}
+@media (min-width:760px){.flow-col{min-width:196px;max-width:260px;flex:1 1 0}}
+.chev{display:flex;align-items:center;justify-content:center;color:var(--idle);flex:0 0 auto}
+.chev::after{content:"\2193";font-size:15px}
+@media (min-width:760px){.chev::after{content:"\2192"}}
+.node{
+  background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--tone,var(--idle));
+  border-radius:8px;padding-inline:11px;padding-block:9px 10px;box-shadow:var(--shadow);
+  display:flex;flex-direction:column;gap:4px;height:100%;
+}
+.node-name{font-family:var(--display);font-weight:500;font-size:13.5px;line-height:1.4}
+.node-what{font-size:11.5px;color:var(--muted);line-height:1.55}
+.node-dep{font-size:11px;color:var(--muted)}
+.node-next{font-size:11.5px;line-height:1.5}
+.node-next span{color:var(--muted);font-size:10.5px;letter-spacing:.06em;margin-right:4px}
+
+.badge{
+  display:inline-flex;align-items:center;gap:5px;align-self:flex-start;
+  font-size:11.5px;font-weight:500;border-radius:999px;
+  padding-inline:8px;padding-block:1px;
+  color:var(--tone,var(--idle));
+  border:1px solid color-mix(in srgb,var(--tone,var(--idle)) 40%,var(--line));
+  background:color-mix(in srgb,var(--tone,var(--idle)) 10%,var(--surface));
+  white-space:nowrap;
+}
+.badge::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--tone,var(--idle));flex:0 0 auto}
+.badge.plain::before{display:none}
+.tone-ok{--tone:var(--ok)}
+.tone-wait{--tone:var(--wait)}
+.tone-wip{--tone:var(--wip)}
+.tone-risk{--tone:var(--risk)}
+.tone-idle{--tone:var(--idle)}
+.waitnote{font-size:11px;color:var(--muted);margin-top:-1px}
+
+/* ===== 区切り ===== */
+.divider{margin-block:40px 8px;text-align:center;position:relative}
+.divider::before{
+  content:"";display:block;height:5px;
+  border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+}
+.divider-label{
+  display:inline-block;transform:translateY(-50%);
+  background:var(--ground);padding-inline:14px;
+  font-family:var(--display);font-weight:500;font-size:11.5px;letter-spacing:.14em;color:var(--muted);
+}
+.divider-sub{margin:0;color:var(--muted);font-size:11.5px}
+
+/* ===== 後半 ===== */
+.sec{margin-block:34px 0}
+.sec.front{margin-block:16px 0}
+.sec.front>.sec-h{font-size:12px;letter-spacing:.09em;color:var(--muted);font-weight:500;border-bottom:0;padding-bottom:0;margin-bottom:6px}
+.sec-h{
+  margin:0 0 10px;font-family:var(--display);font-weight:700;
+  font-size:clamp(15px,2.8vw,18px);line-height:1.45;
+  padding-bottom:5px;border-bottom:1px solid var(--line);
+}
+.sec-note{margin:-4px 0 10px;color:var(--muted);font-size:11.5px;font-family:var(--mono);font-variant-numeric:tabular-nums}
+.prose p{margin-block:0 10px;font-size:14px}
+.prose p:last-child{margin-bottom:0}
+.list{margin:0;padding-left:1.2em;font-size:13.5px}
+.list li{margin-block:4px}
+
+.watch{display:flex;flex-direction:column;gap:10px}
+.watch-item{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+  padding-inline:13px;padding-block:11px 12px;box-shadow:var(--shadow)}
+.watch-item.sched{border-left:3px solid var(--wait)}
+.watch-h{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:baseline;margin-bottom:4px}
+.watch-t{font-family:var(--display);font-weight:500;font-size:14px}
+.watch-kv{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;font-size:12.5px}
+.watch-kv dt{color:var(--muted);font-size:11.5px;white-space:nowrap}
+.watch-kv dd{margin:0}
+
+.spec{display:grid;grid-template-columns:1fr;gap:0;background:var(--surface);
+  border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+.spec-row{display:grid;grid-template-columns:1fr;gap:0;border-bottom:1px solid var(--line)}
+.spec-row:last-child{border-bottom:0}
+@media (min-width:560px){.spec-row{grid-template-columns:minmax(120px,26%) 1fr}}
+.spec-k{padding-inline:12px;padding-block:8px 2px;font-size:12px;color:var(--muted)}
+.spec-v{padding-inline:12px;padding-block:0 9px;font-size:13.5px}
+@media (min-width:560px){
+  .spec-k{padding-block:9px;border-right:1px solid var(--line)}
+  .spec-v{padding-block:9px}
+}
+
+.scroller{overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--line);
+  border-radius:var(--radius);background:var(--surface);box-shadow:var(--shadow)}
+/* 図(SVG)の既定色。state.json 側のトークン参照が誤っていても、文字だけは判読できる状態で崩れるようにする。
+   :where() で詳細度を0にし、SVG側の要素に明示された fill / stroke 属性を必ず優先させる。 */
+:where(.scroller svg){fill:var(--ink);stroke:var(--muted)}
+/* text は stroke を持たないため、既定の stroke を継承すると輪郭が乗って文字が太って見える。
+   SVG の stroke の初期値である none に戻す。 */
+:where(.scroller svg text){stroke:none}
+table.tbl{border-collapse:collapse;width:100%;min-width:760px;font-size:12.5px}
+table.tbl th,table.tbl td{padding-inline:10px;padding-block:8px;text-align:left;
+  border-bottom:1px solid var(--line);vertical-align:top;white-space:nowrap}
+table.tbl th{font-weight:500;font-size:11px;letter-spacing:.05em;color:var(--muted);
+  background:color-mix(in srgb,var(--ink) 3%,var(--surface));position:sticky;top:0}
+table.tbl tr:last-child td{border-bottom:0}
+table.tbl td.wrapcell{white-space:normal;min-width:180px}
+table.tbl td.num,table.tbl th.num{font-family:var(--mono);font-variant-numeric:tabular-nums;text-align:right}
+.warn{color:var(--risk);font-weight:600}
+.diffnum .add{color:var(--ok)}
+.diffnum .del{color:var(--risk)}
+
+.progress{display:flex;flex-direction:column;gap:5px;margin-bottom:12px;
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+  padding-inline:13px;padding-block:11px 12px}
+.progress-h{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline;font-size:13px}
+.progress-n{font-family:var(--mono);font-variant-numeric:tabular-nums;font-weight:600}
+.bar{height:7px;border-radius:999px;background:color-mix(in srgb,var(--ink) 8%,var(--surface));overflow:hidden}
+.bar>i{display:block;height:100%;background:var(--accent);border-radius:999px}
+
+.tree{margin:0;padding:0;list-style:none;font-size:13px}
+.tree-repo{font-family:var(--mono);font-size:12px;color:var(--muted);margin-block:14px 6px}
+.tree-repo:first-child{margin-top:0}
+.tree li{display:flex;flex-wrap:wrap;gap:3px 8px;align-items:baseline;padding-block:4px;border-bottom:1px dashed var(--line)}
+.tree li:last-child{border-bottom:0}
+.tree .bname{font-family:var(--mono);font-size:12.5px;word-break:break-all}
+.kind{font-size:10.5px;letter-spacing:.05em;border-radius:3px;padding-inline:5px;
+  color:var(--tone,var(--idle));border:1px solid color-mix(in srgb,var(--tone,var(--idle)) 35%,var(--line))}
+.tree .note{font-size:11.5px;color:var(--muted)}
+
+.diffblk{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--accent);
+  border-radius:8px;padding-inline:13px;padding-block:10px 11px;margin-bottom:10px;box-shadow:var(--shadow)}
+.diffblk h3{margin:0 0 4px;font-family:var(--display);font-weight:500;font-size:13.5px}
+.diffblk p{margin:0 0 6px;font-size:13px}
+.diffblk p:last-child{margin-bottom:0}
+
+/* ===== ガント ===== */
+.gan-legend{display:flex;flex-wrap:wrap;gap:4px 14px;align-items:center;margin-bottom:8px;
+  font-size:11.5px;color:var(--muted)}
+.gan-swatch{display:inline-block;width:34px;height:10px;border-radius:2px;vertical-align:-1px;margin-right:5px;
+  background:repeating-linear-gradient(135deg,color-mix(in srgb,var(--accent) 34%,transparent) 0 4px,transparent 4px 8px);
+  border-left:2px solid var(--accent);border-right:2px dashed var(--accent)}
+.gan{min-width:max-content;font-size:11px}
+.gan-row{display:flex;align-items:stretch;border-bottom:1px solid var(--line)}
+.gan-row:last-child{border-bottom:0}
+.gan-name{position:sticky;left:0;z-index:2;background:var(--surface);border-right:1px solid var(--line);
+  width:132px;min-width:132px;padding-inline:10px;padding-block:7px;font-size:12px;
+  display:flex;align-items:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gan-track{position:relative;display:flex;flex:1 0 auto}
+.gan-cell{border-right:1px solid color-mix(in srgb,var(--line) 55%,transparent);flex:0 0 auto}
+.gan-cell.we{background:color-mix(in srgb,var(--ink) 5%,transparent)}
+.gan-head .gan-cell{padding-block:4px;text-align:center;font-family:var(--mono);color:var(--muted);
+  font-variant-numeric:tabular-nums;font-size:10px}
+.gan-head .gan-name{font-size:11px;color:var(--muted)}
+.gan-months{position:relative;height:16px}
+.gan-month{position:absolute;top:0;font-family:var(--mono);font-size:10px;color:var(--muted);
+  padding-left:3px;border-left:1px solid var(--line);line-height:16px;white-space:nowrap}
+.gan-bar{
+  position:absolute;top:6px;bottom:6px;border-radius:3px;
+  background:repeating-linear-gradient(135deg,color-mix(in srgb,var(--accent) 30%,transparent) 0 5px,transparent 5px 10px);
+  border-left:2px solid var(--accent);border-right:2px dashed var(--accent);
+}
+.gan-baroff{position:absolute;top:5px;font-family:var(--mono);font-size:10px;color:var(--muted);
+  white-space:nowrap;line-height:16px;font-variant-numeric:tabular-nums}
+.gan-norange{position:absolute;left:6px;top:6px;font-size:10.5px;color:var(--muted)}
+
+.log{list-style:none;margin:0;padding:0;font-size:11.5px;color:var(--muted)}
+.log li{display:flex;flex-wrap:wrap;gap:2px 12px;padding-block:3px;border-bottom:1px dashed var(--line)}
+.log li:last-child{border-bottom:0}
+.log .d{font-family:var(--mono);font-variant-numeric:tabular-nums}
+
+.links{list-style:none;margin:0;padding:0;font-size:13.5px}
+.links li{padding-block:5px;border-bottom:1px dashed var(--line)}
+.links li:last-child{border-bottom:0}
+.links .u{font-family:var(--mono);font-size:11px;color:var(--muted);word-break:break-all;display:block}
+
+.foot{margin-top:38px;padding-top:12px;border-top:1px solid var(--line);
+  font-size:11px;color:var(--muted);font-family:var(--mono);word-break:break-all}
+
+.notice{
+  margin-block:24px;background:var(--surface);border:1px solid color-mix(in srgb,var(--risk) 45%,var(--line));
+  border-left:3px solid var(--risk);border-radius:var(--radius);
+  padding-inline:14px;padding-block:12px 13px;box-shadow:var(--shadow);
+}
+.notice h2{margin:0 0 5px;font-family:var(--display);font-weight:700;font-size:15px;color:var(--risk)}
+.notice p{margin:0 0 5px;font-size:13px}
+.notice p:last-child{margin-bottom:0}
+.notice .why{font-family:var(--mono);font-size:11.5px;color:var(--muted);word-break:break-all}
+.loading{color:var(--muted);font-size:13px;padding-block:28px}
+
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:.001ms !important;animation-iteration-count:1 !important;
+    transition-duration:.001ms !important;scroll-behavior:auto !important}
+}
+</style>
+
+<header class="masthead">
+  <div class="masthead-in">
+    <h1 id="mh-title">進捗レポート</h1>
+    <span class="asof" id="mh-asof"></span>
+  </div>
+</header>
+<main class="wrap" id="app">
+  <p class="loading" id="boot">読み込み中…</p>
+</main>
+
+<script>
+(function () {
+  "use strict";
+
+  /* =========================================================
+   * 0. 定数
+   * =======================================================*/
+  var STATE_URL = "state.json";
+  var REVIEW_WAIT_ALERT_DAYS = 3;   // レビュー待ちがこの日数以上で警告表示
+  var MS_PER_DAY = 86400000;
+  var GANTT_MAX_DAYS = 240;         // これを超える見込み幅ではチャートを描かない
+  var GANTT_COL_W = 22;             // ガント1日あたりの幅(px)
+  var GANTT_TAIL_W = 168;           // ガント右端の余白(px)。レンジ注記の見切れ防止
+  var BRANCH_MAX_DEPTH = 6;         // ブランチツリーのインデント上限
+
+  var DASH = "—";
+
+  /* =========================================================
+   * 1. サニタイズ層 : 外部入力の型ゆれをここだけで吸収する
+   * =======================================================*/
+  function isPlainObject(v) {
+    return v !== null && typeof v === "object" && !Array.isArray(v);
+  }
+  /** 文字列化。数値も受け入れる。それ以外は空文字 */
+  function S(v) {
+    if (typeof v === "string") return v.trim();
+    if (typeof v === "number" && isFinite(v)) return String(v);
+    return "";
+  }
+  /** 有限数だけ返す。数値化できない場合は null */
+  function N(v) {
+    if (typeof v === "number") return isFinite(v) ? v : null;
+    if (typeof v === "string" && v.trim() !== "") {
+      var n = Number(v);
+      if (isFinite(n)) return n;
+    }
+    return null;
+  }
+  function A(v) { return Array.isArray(v) ? v : []; }
+  function O(v) { return isPlainObject(v) ? v : {}; }
+  /** true / "true" のみ真とみなす */
+  function TRUE(v) { return v === true || v === "true"; }
+
+  /** y/mo/dがカレンダー上実在する日付か(2026-02-30等を弾く) */
+  function isValidCalendarDate(y, mo, d) {
+    var dt = new Date(Date.UTC(y, mo - 1, d));
+    return dt.getUTCFullYear() === y && dt.getUTCMonth() === mo - 1 && dt.getUTCDate() === d;
+  }
+  /**
+   * 日付文字列 -> epoch ms(不正なら null)。
+   * SCHEMA.md が定める YYYY-MM-DD、または ISO 8601 UTC(Z終端)のみを受け付ける。
+   * Date.parse は 2026-02-30 のような不正日付を正規化してしまうため使わない。
+   */
+  function parseMs(v) {
+    var s = S(v);
+    if (!s) return null;
+    var m = /^(\d{4})-(\d{2})-(\d{2})(?:[T ](\d{2}):(\d{2}):(\d{2})(?:\.\d+)?Z)?$/.exec(s);
+    if (!m) return null;
+    var y = parseInt(m[1], 10), mo = parseInt(m[2], 10), d = parseInt(m[3], 10);
+    if (mo < 1 || mo > 12 || d < 1 || d > 31 || !isValidCalendarDate(y, mo, d)) return null;
+    var hh = m[4] ? parseInt(m[4], 10) : 0;
+    var mi = m[5] ? parseInt(m[5], 10) : 0;
+    var ss = m[6] ? parseInt(m[6], 10) : 0;
+    if (hh > 23 || mi > 59 || ss > 59) return null;
+    var ms = Date.UTC(y, mo - 1, d, hh, mi, ss);
+    return isFinite(ms) ? ms : null;
+  }
+  /** UTC 基準の通日番号。日付だけ/日時混在でも一貫して差分が取れる */
+  function dayIndexOf(ms) { return Math.floor(ms / MS_PER_DAY); }
+  function pad2(n) { return (n < 10 ? "0" : "") + n; }
+
+  /** YYYY-MM-DD 表示。解釈できない値は原文をそのまま出す */
+  function fmtDate(v) {
+    var ms = parseMs(v);
+    if (ms === null) return S(v) || DASH;
+    var d = new Date(ms);
+    return d.getUTCFullYear() + "-" + pad2(d.getUTCMonth() + 1) + "-" + pad2(d.getUTCDate());
+  }
+  function fmtDateTime(v) {
+    var ms = parseMs(v);
+    if (ms === null) return S(v) || DASH;
+    var d = new Date(ms);
+    return fmtDate(v) + " " + pad2(d.getUTCHours()) + ":" + pad2(d.getUTCMinutes()) + " UTC";
+  }
+  /** from -> to の日数。どちらか不正なら null。負値は 0 に丸める（NaN を出さない） */
+  function diffDays(fromV, toV) {
+    var a = parseMs(fromV), b = parseMs(toV);
+    if (a === null || b === null) return null;
+    var d = dayIndexOf(b) - dayIndexOf(a);
+    return d < 0 ? 0 : d;
+  }
+  function fmtDays(d) { return d === null ? DASH : d + "日"; }
+  function fmtNum(v) { var n = N(v); return n === null ? DASH : String(n); }
+  function httpUrl(v) { var s = S(v); return /^https?:\/\//i.test(s) ? s : ""; }
+  function isRepo(v) { return /^[\w.\-]+\/[\w.\-]+$/.test(S(v)); }
+  function ghUrl(repo, kind, number) {
+    var n = N(number);
+    if (!isRepo(repo) || n === null) return "";
+    return "https://github.com/" + S(repo) + "/" + kind + "/" + n;
+  }
+
+  /* =========================================================
+   * 2. 正規化層 : 生 JSON -> 形の決まったモデル
+   * =======================================================*/
+  function normalize(raw) {
+    var d = O(raw);
+    var meta = O(d.meta);
+    var fc = O(d.forecast);
+    var detail = O(d.detail);
+    var facts = O(d.facts);
+
+    return {
+      meta: {
+        title: S(meta.title),
+        asOf: S(meta.asOf),
+        oneLiner: S(meta.oneLiner),
+        artifactUrl: S(meta.artifactUrl),
+        targets: A(meta.targets).map(function (t) {
+          var o = O(t);
+          return { partId: N(o.partId), repo: S(o.repo), issue: N(o.issue), pr: N(o.pr) };
+        }),
+        parent: { repo: S(O(meta.parent).repo), issue: N(O(meta.parent).issue) }
+      },
+      headline: S(d.headline),
+      forecast: {
+        earliest: S(fc.earliest),
+        latest: S(fc.latest),
+        riskCondition: S(fc.riskCondition),
+        assumptions: A(fc.assumptions).map(S).filter(Boolean)
+      },
+      asks: A(d.asks).map(function (x) {
+        var o = O(x);
+        return { what: S(o.what), by: S(o.by), who: S(o.who) };
+      }).filter(function (x) { return x.what || x.by || x.who; }),
+      parts: A(d.parts).map(function (p, i) {
+        var o = O(p);
+        var pf = O(o.forecast);
+        return {
+          key: i,
+          id: N(o.id),
+          name: S(o.name) || ("パート" + (i + 1)),
+          what: S(o.what),
+          dependsOn: A(o.dependsOn).map(N).filter(function (n) { return n !== null; }),
+          next: S(o.next),
+          forecast: { earliest: S(pf.earliest), latest: S(pf.latest) },
+          basis: S(o.basis)
+        };
+      }),
+      watchItems: A(d.watchItems).map(function (x) {
+        var o = O(x);
+        return {
+          title: S(o.title), impact: S(o.impact), action: S(o.action),
+          affectsSchedule: TRUE(o.affectsSchedule)
+        };
+      }).filter(function (x) { return x.title || x.impact || x.action; }),
+      detail: {
+        featureDescription: A(detail.featureDescription).map(S).filter(Boolean),
+        diagramSvg: S(detail.diagramSvg),
+        spec: A(detail.spec).map(function (x) {
+          var o = O(x); return { k: S(o.k), v: S(o.v) };
+        }).filter(function (x) { return x.k || x.v; }),
+        branches: A(detail.branches).map(function (b) {
+          var o = O(b);
+          return {
+            repo: S(o.repo),
+            nodes: A(o.nodes).map(function (n) {
+              var q = O(n);
+              var depth = N(q.depth);
+              return {
+                name: S(q.name),
+                kind: S(q.kind),
+                depth: depth === null ? 0 : Math.max(0, Math.min(BRANCH_MAX_DEPTH, Math.floor(depth))),
+                pr: N(q.pr),
+                prUrl: httpUrl(q.prUrl),
+                note: S(q.note)
+              };
+            }).filter(function (n) { return n.name; })
+          };
+        }).filter(function (b) { return b.nodes.length > 0; }),
+        planDiff: A(detail.planDiff).map(function (x) {
+          var o = O(x);
+          return { title: S(o.title), body: A(o.body).map(S).filter(Boolean) };
+        }).filter(function (x) { return x.title || x.body.length; }),
+        remaining: A(detail.remaining).map(S).filter(Boolean),
+        links: A(detail.links).map(function (x) {
+          var o = O(x); return { label: S(o.label), url: S(o.url) };
+        }).filter(function (x) { return x.label || x.url; })
+      },
+      forecastLog: A(d.forecastLog).map(function (x) {
+        var o = O(x);
+        return { asOf: S(o.asOf), earliest: S(o.earliest), latest: S(o.latest) };
+      }).filter(function (x) { return x.asOf || x.earliest || x.latest; }),
+      facts: {
+        generatedAt: S(facts.generatedAt),
+        prs: A(facts.prs).map(function (p) {
+          var o = O(p);
+          return {
+            partId: N(o.partId), repo: S(o.repo), number: N(o.number),
+            url: httpUrl(o.url) || ghUrl(o.repo, "pull", o.number),
+            title: S(o.title), isDraft: TRUE(o.isDraft),
+            base: S(o.base), head: S(o.head),
+            additions: N(o.additions), deletions: N(o.deletions), changedFiles: N(o.changedFiles),
+            ci: S(o.ci), reviewDecision: S(o.reviewDecision), mergeable: S(o.mergeable), state: S(o.state),
+            createdAt: S(o.createdAt), readyForReviewAt: S(o.readyForReviewAt),
+            assignees: A(o.assignees).map(S).filter(Boolean),
+            reviewers: A(o.reviewers).map(S).filter(Boolean)
+          };
+        }),
+        issues: A(facts.issues).map(function (x) {
+          var o = O(x);
+          return {
+            partId: N(o.partId), repo: S(o.repo), number: N(o.number),
+            url: httpUrl(o.url) || ghUrl(o.repo, "issues", o.number),
+            state: S(o.state), createdAt: S(o.createdAt),
+            assignees: A(o.assignees).map(S).filter(Boolean)
+          };
+        }),
+        parent: {
+          subIssueProgress: {
+            total: N(O(O(facts.parent).subIssueProgress).total),
+            completed: N(O(O(facts.parent).subIssueProgress).completed)
+          }
+        }
+      }
+    };
+  }
+
+  /* =========================================================
+   * 3. 導出層 : 状態ラベル・依存注記・レイアウト計算（純粋関数）
+   * =======================================================*/
+  var STATUS = {
+    IDLE:  { label: "未着手",          tone: "idle" },
+    DONE:  { label: "完了",            tone: "ok" },
+    DRAFT: { label: "提出済（下書き）", tone: "wip" },
+    MERGE: { label: "マージ待ち",      tone: "ok" },
+    REVIEW:{ label: "承認待ち",        tone: "wait" }
+  };
+
+  /** PR 単体から状態を導く（PR 表からも使う） */
+  function statusOfPr(pr) {
+    if (!pr) return STATUS.IDLE;
+    if (pr.state === "MERGED") return STATUS.DONE;
+    if (pr.isDraft) return STATUS.DRAFT;
+    if (pr.reviewDecision === "APPROVED") return STATUS.MERGE;
+    return STATUS.REVIEW;
+  }
+
+  /** 同一 partId に複数 PR がある場合は「最も進んだもの」を代表にする */
+  var PR_RANK = { MERGED: 3, OPEN: 2 };
+  function pickPr(list) {
+    var best = null, bestRank = -1;
+    list.forEach(function (pr) {
+      var rank = PR_RANK[pr.state];
+      if (rank === undefined) rank = 1;
+      if (pr.state === "CLOSED") rank = 0;
+      if (rank > bestRank) { best = pr; bestRank = rank; }
+    });
+    return best;
+  }
+
+  function buildPrIndex(prs) {
+    var byPart = {};
+    prs.forEach(function (pr) {
+      if (pr.partId === null) return;
+      var k = String(pr.partId);
+      (byPart[k] || (byPart[k] = [])).push(pr);
+    });
+    return byPart;
+  }
+
+  /**
+   * parts の状態を一括導出。
+   * 戻り値: key -> { status, pr, waitingFor: [name...] }
+   */
+  function derivePartStates(parts, prsByPart) {
+    var partById = {};
+    parts.forEach(function (p) {
+      if (p.id !== null && !(String(p.id) in partById)) partById[String(p.id)] = p;
+    });
+
+    var states = {};
+    parts.forEach(function (p) {
+      var list = p.id === null ? [] : (prsByPart[String(p.id)] || []);
+      var pr = pickPr(list);
+      states[p.key] = { status: statusOfPr(pr), pr: pr, waitingFor: [] };
+    });
+
+    // 依存先が「完了」でないものを併記する（存在しない id は黙って無視）
+    parts.forEach(function (p) {
+      var names = [];
+      p.dependsOn.forEach(function (depId) {
+        var dep = partById[String(depId)];
+        if (!dep || dep.key === p.key) return;
+        var ds = states[dep.key];
+        if (ds && ds.status !== STATUS.DONE && names.indexOf(dep.name) === -1) names.push(dep.name);
+      });
+      states[p.key].waitingFor = names;
+    });
+    return states;
+  }
+
+  function waitingNote(names) {
+    return names.length ? "（" + names.join("・") + "の完了待ち）" : "";
+  }
+
+  /** dependsOn から段（列）を決める。循環は 0 段として打ち切る */
+  function computeLevels(parts) {
+    var partById = {};
+    parts.forEach(function (p) {
+      if (p.id !== null && !(String(p.id) in partById)) partById[String(p.id)] = p;
+    });
+    var level = {}, visiting = {};
+    function lv(p) {
+      var k = String(p.key);
+      if (level[k] !== undefined) return level[k];
+      if (visiting[k]) return 0;
+      visiting[k] = true;
+      var m = 0;
+      p.dependsOn.forEach(function (depId) {
+        var dep = partById[String(depId)];
+        if (dep && dep.key !== p.key) m = Math.max(m, lv(dep) + 1);
+      });
+      visiting[k] = false;
+      level[k] = m;
+      return m;
+    }
+    parts.forEach(lv);
+    return level;
+  }
+
+  /* =========================================================
+   * 4. DOM ヘルパ : 文字列は必ず textContent 経由
+   * =======================================================*/
+  function h(tag, cls, text) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text !== undefined && text !== null && text !== "") e.textContent = String(text);
+    return e;
+  }
+  function add(parent) {
+    for (var i = 1; i < arguments.length; i++) {
+      var c = arguments[i];
+      if (c) parent.appendChild(c);
+    }
+    return parent;
+  }
+  function linkOrText(url, label) {
+    var text = label || url;
+    var safe = httpUrl(url);
+    if (!safe) return document.createTextNode(text || DASH);
+    var a = h("a", null, text || safe);
+    a.href = safe;
+    a.rel = "noopener noreferrer";
+    a.target = "_blank";
+    return a;
+  }
+  function badge(label, tone, plain) {
+    var b = h("span", "badge tone-" + (tone || "idle") + (plain ? " plain" : ""), label);
+    return b;
+  }
+  /** レンダラ1個分の失敗をページ全体に波及させない */
+  function safeNode(fn, model, states) {
+    try { return fn(model, states); } catch (e) { return null; }
+  }
+
+  /** 節を作る。中身が null なら節ごと出さない */
+  function section(title, body, note) {
+    if (!body) return null;
+    var s = h("section", "sec");
+    add(s, h("h2", "sec-h", title));
+    if (note) add(s, h("p", "sec-note", note));
+    add(s, body);
+    return s;
+  }
+
+  /* =========================================================
+   * 5. レンダラ（前半）
+   * =======================================================*/
+  function renderMasthead(m) {
+    var t = document.getElementById("mh-title");
+    var a = document.getElementById("mh-asof");
+    if (t) t.textContent = m.meta.title || "進捗レポート";
+    if (a) a.textContent = m.meta.asOf ? "基準日 " + fmtDate(m.meta.asOf) : "";
+  }
+
+  function renderLede(m) {
+    if (!m.headline && !m.meta.oneLiner) return null;
+    var box = h("div", "lede");
+    if (m.headline) add(box, h("p", "headline", m.headline));
+    if (m.meta.oneLiner) add(box, h("p", "oneliner", m.meta.oneLiner));
+    return box;
+  }
+
+  function renderForecastCard(m) {
+    var f = m.forecast;
+    if (!f.earliest && !f.latest && !f.riskCondition && !f.assumptions.length) return null;
+    var card = h("div", "card");
+    add(card, h("p", "card-h", "いつ使えるか"));
+
+    if (f.earliest || f.latest) {
+      var row = h("div", "range");
+      var a1 = h("div", "range-item");
+      add(a1, h("span", "range-k", "最短"), h("span", "range-v", f.earliest ? fmtDate(f.earliest) : DASH));
+      var sep = h("span", "range-sep", "／");
+      var a2 = h("div", "range-item");
+      add(a2, h("span", "range-k", "最遅"), h("span", "range-v", f.latest ? fmtDate(f.latest) : DASH));
+      add(row, a1, sep, a2);
+      add(card, row);
+    }
+    if (f.riskCondition) {
+      var r = h("div", "riskline");
+      add(r, h("b", null, "最遅に振れる条件"), document.createTextNode(f.riskCondition));
+      add(card, r);
+    }
+    if (f.assumptions.length) {
+      var ul = h("ul", "assump");
+      f.assumptions.forEach(function (s) { add(ul, h("li", null, s)); });
+      add(card, ul);
+    }
+    return card;
+  }
+
+  function renderAsks(m) {
+    if (!m.asks.length) return null;
+    var card = h("div", "card");
+    add(card, h("p", "card-h", "お願いしたいこと"));
+    var ul = h("ul", "asks");
+    m.asks.forEach(function (x) {
+      var li = h("li", "ask");
+      add(li, h("span", "ask-what", x.what || DASH));
+      if (x.by) add(li, h("span", "ask-by", "〜" + fmtDate(x.by)));
+      if (x.who) add(li, h("span", "ask-who", x.who));
+      add(ul, li);
+    });
+    add(card, ul);
+    return card;
+  }
+
+  /** パートのフロー図。日付は出さない */
+  function renderFlow(m, states) {
+    if (!m.parts.length) return null;
+    var levels = computeLevels(m.parts);
+    var cols = [];
+    m.parts.forEach(function (p) {
+      var L = levels[String(p.key)] || 0;
+      (cols[L] || (cols[L] = [])).push(p);
+    });
+
+    var wrap = h("div", "flowwrap");
+    var flow = h("div", "flow");
+    var first = true;
+    cols.forEach(function (group) {
+      if (!group || !group.length) return;
+      if (!first) add(flow, h("div", "chev"));
+      first = false;
+      var col = h("div", "flow-col");
+      group.forEach(function (p) {
+        var st = states[p.key];
+        var node = h("div", "node tone-" + st.status.tone);
+        add(node, h("div", "node-name", p.name));
+        add(node, badge(st.status.label, st.status.tone));
+        if (st.waitingFor.length) add(node, h("div", "waitnote", waitingNote(st.waitingFor)));
+        if (p.what) add(node, h("div", "node-what", p.what));
+        if (p.dependsOn.length) {
+          var depNames = [];
+          p.dependsOn.forEach(function (id) {
+            m.parts.forEach(function (q) {
+              if (q.id !== null && q.id === id && depNames.indexOf(q.name) === -1) depNames.push(q.name);
+            });
+          });
+          if (depNames.length) add(node, h("div", "node-dep", "← " + depNames.join("・") + " に依存"));
+        }
+        if (p.next) {
+          var nx = h("div", "node-next");
+          add(nx, h("span", null, "次にやること"), document.createTextNode(p.next));
+          add(node, nx);
+        }
+        add(col, node);
+      });
+      add(flow, col);
+    });
+    add(wrap, flow);
+    var sec = section(m.parts.length + "パートの状態", wrap);
+    if (sec) sec.className = "sec front";
+    return sec;
+  }
+
+  function renderDivider() {
+    var d = h("div", "divider");
+    add(d, h("span", "divider-label", "ここから先は詳細"));
+    add(d, h("p", "divider-sub", "共有だけなら、ここまでで足ります。"));
+    return d;
+  }
+
+  /* =========================================================
+   * 6. レンダラ（後半）
+   * =======================================================*/
+  function renderFeature(m) {
+    var xs = m.detail.featureDescription;
+    if (!xs.length) return null;
+    var box = h("div", "prose");
+    xs.forEach(function (s) { add(box, h("p", null, s)); });
+    return section("この機能でできるようになること", box);
+  }
+
+  function renderWatch(m) {
+    if (!m.watchItems.length) return null;
+    var sorted = m.watchItems.slice().sort(function (a, b) {
+      return (b.affectsSchedule ? 1 : 0) - (a.affectsSchedule ? 1 : 0);
+    });
+    var box = h("div", "watch");
+    sorted.forEach(function (w) {
+      var it = h("div", "watch-item" + (w.affectsSchedule ? " sched" : ""));
+      var hd = h("div", "watch-h");
+      add(hd, h("span", "watch-t", w.title || DASH));
+      if (w.affectsSchedule) add(hd, badge("日程に効く", "wait"));
+      add(it, hd);
+      if (w.impact || w.action) {
+        var dl = h("dl", "watch-kv");
+        if (w.impact) { add(dl, h("dt", null, "影響"), h("dd", null, w.impact)); }
+        if (w.action) { add(dl, h("dt", null, "対応"), h("dd", null, w.action)); }
+        add(it, dl);
+      }
+      add(box, it);
+    });
+    return section("注意している点", box);
+  }
+
+  var SVG_ALLOWED_TAGS = {
+    svg: 1, g: 1, path: 1, rect: 1, circle: 1, ellipse: 1, line: 1,
+    polyline: 1, polygon: 1, text: 1, tspan: 1, defs: 1, marker: 1,
+    use: 1, title: 1, desc: 1
+  };
+  /** SVG文字列を許可リスト方式でサニタイズする。パース不能/svg以外のルートは null */
+  function sanitizeSvg(svgString) {
+    var doc;
+    try {
+      doc = new DOMParser().parseFromString(String(svgString), "image/svg+xml");
+    } catch (e) {
+      return null;
+    }
+    if (doc.querySelector("parsererror")) return null;
+    var root = doc.documentElement;
+    if (!root || root.tagName.toLowerCase() !== "svg") return null;
+    sanitizeSvgNode(root);
+    return root;
+  }
+  function sanitizeSvgNode(node) {
+    Array.prototype.slice.call(node.childNodes).forEach(function (child) {
+      if (child.nodeType === 8) { node.removeChild(child); return; }
+      if (child.nodeType !== 1) return;
+      var tag = child.tagName.toLowerCase();
+      if (!SVG_ALLOWED_TAGS[tag]) { node.removeChild(child); return; }
+      Array.prototype.slice.call(child.attributes).forEach(function (attr) {
+        var name = attr.name.toLowerCase();
+        if (/^on/.test(name)) { child.removeAttribute(attr.name); return; }
+        if ((name === "href" || name === "xlink:href") && /^\s*javascript:/i.test(attr.value)) {
+          child.removeAttribute(attr.name);
+        }
+      });
+      sanitizeSvgNode(child);
+    });
+  }
+
+  function renderDiagram(m) {
+    var svg = m.detail.diagramSvg;
+    if (!svg) return null;
+    var box = h("div", "scroller");
+    var inner = h("div");
+    inner.style.padding = "12px";
+    inner.style.minWidth = "max-content";
+    var sanitized = sanitizeSvg(svg);
+    if (sanitized) inner.appendChild(document.importNode(sanitized, true));
+    add(box, inner);
+    return section("構成と処理の流れ", box);
+  }
+
+  function renderSpec(m) {
+    if (!m.detail.spec.length) return null;
+    var box = h("div", "spec");
+    m.detail.spec.forEach(function (kv) {
+      var row = h("div", "spec-row");
+      add(row, h("div", "spec-k", kv.k || DASH), h("div", "spec-v", kv.v || DASH));
+      add(box, row);
+    });
+    return section("仕様上の前提", box);
+  }
+
+  var CI_LABEL = { SUCCESS: "成功", FAILURE: "失敗", PENDING: "実行中" };
+  var CI_TONE = { SUCCESS: "ok", FAILURE: "risk", PENDING: "wait" };
+  var RV_LABEL = { APPROVED: "承認済", CHANGES_REQUIRED: "要修正", CHANGES_REQUESTED: "要修正", REVIEW_REQUIRED: "レビュー待ち" };
+  var RV_TONE = { APPROVED: "ok", CHANGES_REQUESTED: "risk", REVIEW_REQUIRED: "wait" };
+  var MG_LABEL = { MERGEABLE: "可", CONFLICTING: "衝突", UNKNOWN: "不明" };
+  var MG_TONE = { MERGEABLE: "ok", CONFLICTING: "risk", UNKNOWN: "idle" };
+  var ST_LABEL = { OPEN: "オープン", MERGED: "マージ済", CLOSED: "クローズ" };
+  var ST_TONE = { OPEN: "wait", MERGED: "ok", CLOSED: "idle" };
+
+  /** 既知なら和名＋色、未知ならそのまま表示して色は既定にフォールバック */
+  function enumCell(value, labels, tones) {
+    var v = S(value);
+    if (!v) return document.createTextNode(DASH);
+    var label = labels[v] || v;
+    var tone = tones[v] || "idle";
+    return badge(label, tone, true);
+  }
+
+  function renderPrTable(m) {
+    var prs = m.facts.prs;
+    if (!prs.length) return null;
+
+    var partNameById = {};
+    m.parts.forEach(function (p) { if (p.id !== null && !(String(p.id) in partNameById)) partNameById[String(p.id)] = p.name; });
+
+    var scroller = h("div", "scroller");
+    var tbl = h("table", "tbl");
+    var thead = h("thead");
+    var hr = h("tr");
+    var NUM_COLS = { 5: true, 9: true, 10: true }; // 差分 / 着手から / レビュー待ち
+    ["パート", "PR", "内容", "状態", "取り込み先", "差分", "CI", "レビュー", "マージ", "着手から", "レビュー待ち", "担当"]
+      .forEach(function (t, i) {
+        add(hr, h("th", NUM_COLS[i] ? "num" : null, t));
+      });
+    add(thead, hr);
+    add(tbl, thead);
+
+    var tb = h("tbody");
+    prs.forEach(function (pr) {
+      var tr = h("tr");
+      var pname = pr.partId !== null ? (partNameById[String(pr.partId)] || ("#" + pr.partId)) : DASH;
+      add(tr, h("td", null, pname));
+
+      var tdPr = h("td");
+      var label = (pr.repo ? pr.repo + " " : "") + (pr.number !== null ? "#" + pr.number : DASH);
+      var anchor = linkOrText(pr.url, label);
+      if (anchor.nodeType === 1) anchor.className = "mono";
+      add(tdPr, anchor);
+      add(tr, tdPr);
+
+      add(tr, h("td", "wrapcell", pr.title || DASH));
+
+      var st = statusOfPr(pr);
+      var tdSt = h("td");
+      add(tdSt, badge(st.label, st.tone));
+      add(tr, tdSt);
+
+      add(tr, h("td", "mono", (pr.base || DASH) + " ← " + (pr.head || DASH)));
+
+      var tdDiff = h("td", "num diffnum");
+      if (pr.additions === null && pr.deletions === null && pr.changedFiles === null) {
+        tdDiff.textContent = DASH;
+      } else {
+        add(tdDiff, h("span", "add", pr.additions === null ? DASH : "+" + pr.additions));
+        tdDiff.appendChild(document.createTextNode(" "));
+        add(tdDiff, h("span", "del", pr.deletions === null ? DASH : "-" + pr.deletions));
+        tdDiff.appendChild(document.createTextNode(
+          " / " + (pr.changedFiles === null ? DASH : pr.changedFiles + "f")));
+      }
+      add(tr, tdDiff);
+
+      var tdCi = h("td"); tdCi.appendChild(enumCell(pr.ci, CI_LABEL, CI_TONE)); add(tr, tdCi);
+      var tdRv = h("td"); tdRv.appendChild(enumCell(pr.reviewDecision, RV_LABEL, RV_TONE)); add(tr, tdRv);
+      var tdMg = h("td"); tdMg.appendChild(enumCell(pr.mergeable, MG_LABEL, MG_TONE)); add(tr, tdMg);
+
+      var opened = diffDays(pr.createdAt, m.meta.asOf);
+      add(tr, h("td", "num", fmtDays(opened)));
+
+      var waiting = pr.readyForReviewAt ? diffDays(pr.readyForReviewAt, m.meta.asOf) : null;
+      var tdW = h("td", "num");
+      if (waiting === null) {
+        tdW.textContent = DASH;
+      } else if (waiting >= REVIEW_WAIT_ALERT_DAYS) {
+        tdW.className = "num warn";
+        tdW.textContent = "⚠ " + fmtDays(waiting);
+      } else {
+        tdW.textContent = fmtDays(waiting);
+      }
+      add(tr, tdW);
+
+      var who = pr.assignees.concat(pr.reviewers.map(function (r) { return "R:" + r; }));
+      add(tr, h("td", null, who.length ? who.join(" / ") : DASH));
+
+      add(tb, tr);
+    });
+    add(tbl, tb);
+    add(scroller, tbl);
+
+    var note = "この表の取得時刻: " + (m.facts.generatedAt ? fmtDateTime(m.facts.generatedAt) : DASH) +
+      " ／ 経過日数は基準日 " + (m.meta.asOf ? fmtDate(m.meta.asOf) : DASH) + " からの日数。レビュー待ち " +
+      REVIEW_WAIT_ALERT_DAYS + "日以上は ⚠ 表示";
+    return section("PRの状態", scroller, note);
+  }
+
+  /** facts が空のときの代替。meta.targets から対象だけでも示す */
+  function renderTargets(m) {
+    if (m.facts.prs.length) return null;
+    var ts = m.meta.targets;
+    if (!ts.length) return null;
+
+    var partNameById = {};
+    m.parts.forEach(function (p) { if (p.id !== null && !(String(p.id) in partNameById)) partNameById[String(p.id)] = p.name; });
+
+    var scroller = h("div", "scroller");
+    var tbl = h("table", "tbl");
+    tbl.style.minWidth = "480px";
+    var thead = h("thead"), hr = h("tr");
+    ["パート", "リポジトリ", "課題", "PR"].forEach(function (t) { add(hr, h("th", null, t)); });
+    add(thead, hr); add(tbl, thead);
+    var tb = h("tbody");
+    ts.forEach(function (t) {
+      var tr = h("tr");
+      add(tr, h("td", null, t.partId !== null ? (partNameById[String(t.partId)] || ("#" + t.partId)) : DASH));
+      add(tr, h("td", "mono", t.repo || DASH));
+      var tdI = h("td");
+      tdI.appendChild(t.issue !== null ? linkOrText(ghUrl(t.repo, "issues", t.issue), "#" + t.issue) : document.createTextNode(DASH));
+      add(tr, tdI);
+      var tdP = h("td");
+      tdP.appendChild(t.pr !== null ? linkOrText(ghUrl(t.repo, "pull", t.pr), "#" + t.pr) : document.createTextNode(DASH));
+      add(tr, tdP);
+      add(tb, tr);
+    });
+    add(tbl, tb); add(scroller, tbl);
+    return section("対象のリポジトリ", scroller, "PRの実績データはまだ取得されていません。");
+  }
+
+  function renderIssues(m) {
+    var issues = m.facts.issues;
+    var prog = m.facts.parent.subIssueProgress;
+    var hasProg = prog.total !== null && prog.total > 0;
+    if (!issues.length && !hasProg) return null;
+
+    var box = h("div");
+
+    if (hasProg) {
+      var completed = prog.completed === null ? 0 : Math.max(0, Math.min(prog.total, prog.completed));
+      var p = h("div", "progress");
+      var hd = h("div", "progress-h");
+      var parentLabel = m.meta.parent.repo && m.meta.parent.issue !== null
+        ? m.meta.parent.repo + " #" + m.meta.parent.issue
+        : "親課題";
+      var pl = h("span");
+      pl.appendChild(linkOrText(ghUrl(m.meta.parent.repo, "issues", m.meta.parent.issue), parentLabel));
+      add(hd, pl);
+      add(hd, h("span", "progress-n", completed + " / " + prog.total + " 完了"));
+      add(p, hd);
+      var bar = h("div", "bar");
+      var i = h("i");
+      i.style.width = Math.round((completed / prog.total) * 100) + "%";
+      add(bar, i);
+      add(p, bar);
+      add(box, p);
+    }
+
+    if (issues.length) {
+      var partNameById = {};
+      m.parts.forEach(function (q) { if (q.id !== null && !(String(q.id) in partNameById)) partNameById[String(q.id)] = q.name; });
+
+      var scroller = h("div", "scroller");
+      var tbl = h("table", "tbl");
+      tbl.style.minWidth = "560px";
+      var thead = h("thead"), hr = h("tr");
+      ["パート", "課題", "状態", "作成から", "担当"].forEach(function (t, idx) {
+        add(hr, h("th", idx === 3 ? "num" : null, t));
+      });
+      add(thead, hr); add(tbl, thead);
+      var tb = h("tbody");
+      issues.forEach(function (is) {
+        var tr = h("tr");
+        add(tr, h("td", null, is.partId !== null ? (partNameById[String(is.partId)] || ("#" + is.partId)) : DASH));
+        var tdI = h("td");
+        var lbl = (is.repo ? is.repo + " " : "") + (is.number !== null ? "#" + is.number : DASH);
+        var an = linkOrText(is.url, lbl);
+        if (an.nodeType === 1) an.className = "mono";
+        add(tdI, an);
+        add(tr, tdI);
+        var tdS = h("td");
+        tdS.appendChild(enumCell(is.state, { OPEN: "オープン", CLOSED: "クローズ" }, { OPEN: "wait", CLOSED: "ok" }));
+        add(tr, tdS);
+        add(tr, h("td", "num", fmtDays(diffDays(is.createdAt, m.meta.asOf))));
+        add(tr, h("td", null, is.assignees.length ? is.assignees.join(" / ") : DASH));
+        add(tb, tr);
+      });
+      add(tbl, tb); add(scroller, tbl);
+      add(box, scroller);
+    }
+    return section("課題の状態", box);
+  }
+
+  var KIND_LABEL = { trunk: "幹", release: "リリース", work: "作業" };
+  var KIND_TONE = { trunk: "idle", release: "wip", work: "wait" };
+
+  function renderBranches(m) {
+    var bs = m.detail.branches;
+    if (!bs.length) return null;
+    var box = h("div");
+    bs.forEach(function (b) {
+      if (b.repo) add(box, h("p", "tree-repo", b.repo));
+      var ul = h("ul", "tree");
+      b.nodes.forEach(function (n) {
+        var li = h("li");
+        li.style.paddingLeft = (n.depth * 16) + "px";
+        if (n.depth > 0) add(li, h("span", "note", "└"));
+        add(li, h("span", "bname", n.name));
+        if (n.kind) {
+          var k = h("span", "kind tone-" + (KIND_TONE[n.kind] || "idle"), KIND_LABEL[n.kind] || n.kind);
+          add(li, k);
+        }
+        if (n.pr !== null) {
+          var url = n.prUrl || ghUrl(b.repo, "pull", n.pr);
+          var an = linkOrText(url, "PR #" + n.pr);
+          if (an.nodeType === 1) an.className = "mono";
+          li.appendChild(an);
+        }
+        if (n.note) add(li, h("span", "note", n.note));
+        add(ul, li);
+      });
+      add(box, ul);
+    });
+    return section("ブランチ構成", box);
+  }
+
+  function renderPlanDiff(m) {
+    var ds = m.detail.planDiff;
+    if (!ds.length) return null;
+    var box = h("div");
+    ds.forEach(function (d) {
+      var blk = h("div", "diffblk");
+      if (d.title) add(blk, h("h3", null, d.title));
+      d.body.forEach(function (p) { add(blk, h("p", null, p)); });
+      add(box, blk);
+    });
+    return section("計画からの差分", box);
+  }
+
+  /** ガント右端の余白セル。バー末尾の注記が見切れないようにする */
+  function ganTail() {
+    var t = h("div", "gan-cell");
+    t.style.width = GANTT_TAIL_W + "px";
+    t.style.borderRight = "0";
+    return t;
+  }
+
+  /** パート別の見込み。可能ならガント、無理なら一覧だけ */
+  function renderPartForecast(m) {
+    var parts = m.parts.filter(function (p) {
+      return p.forecast.earliest || p.forecast.latest || p.basis;
+    });
+    if (!parts.length) return null;
+
+    var box = h("div");
+
+    // --- レンジが取れるパートを集める
+    var ranged = [];
+    var min = null, max = null;
+    parts.forEach(function (p) {
+      var a = parseMs(p.forecast.earliest), b = parseMs(p.forecast.latest);
+      if (a === null && b === null) { ranged.push({ part: p, s: null, e: null }); return; }
+      var s = a === null ? b : a;
+      var e = b === null ? a : b;
+      if (e < s) { var t = s; s = e; e = t; }
+      ranged.push({ part: p, s: dayIndexOf(s), e: dayIndexOf(e) });
+      if (min === null || dayIndexOf(s) < min) min = dayIndexOf(s);
+      if (max === null || dayIndexOf(e) > max) max = dayIndexOf(e);
+    });
+    var asOfIdx = parseMs(m.meta.asOf) === null ? null : dayIndexOf(parseMs(m.meta.asOf));
+    if (min !== null && asOfIdx !== null) {
+      if (asOfIdx < min) min = asOfIdx;
+      if (asOfIdx > max) max = asOfIdx;
+    }
+
+    var days = (min !== null && max !== null) ? (max - min + 1) : 0;
+    if (days > 0 && days <= GANTT_MAX_DAYS) {
+      var legend = h("div", "gan-legend");
+      var sw = h("span");
+      add(sw, h("span", "gan-swatch"));
+      sw.appendChild(document.createTextNode("最短〜最遅の見込み幅（確定した日程ではありません）"));
+      add(legend, sw);
+      add(legend, h("span", null, "左端＝最短、右端の破線＝最遅"));
+      add(box, legend);
+
+      var scroller = h("div", "scroller");
+      var gan = h("div", "gan");
+
+      // 月ラベル行
+      var monthRow = h("div", "gan-row gan-head");
+      add(monthRow, h("div", "gan-name", "パート"));
+      var monthTrack = h("div", "gan-track gan-months");
+      for (var i = 0; i < days; i++) {
+        var d = new Date((min + i) * MS_PER_DAY);
+        if (i === 0 || d.getUTCDate() === 1) {
+          var lab = h("div", "gan-month", (d.getUTCMonth() + 1) + "月");
+          lab.style.left = (i * GANTT_COL_W) + "px";
+          add(monthTrack, lab);
+        }
+      }
+      monthTrack.style.minWidth = (days * GANTT_COL_W + GANTT_TAIL_W) + "px";
+      add(monthRow, monthTrack);
+      add(gan, monthRow);
+
+      // 日付行
+      var headRow = h("div", "gan-row gan-head");
+      add(headRow, h("div", "gan-name", ""));
+      var headTrack = h("div", "gan-track");
+      for (var j = 0; j < days; j++) {
+        var dd = new Date((min + j) * MS_PER_DAY);
+        var wd = dd.getUTCDay();
+        var cell = h("div", "gan-cell" + (wd === 0 || wd === 6 ? " we" : ""), String(dd.getUTCDate()));
+        cell.style.width = GANTT_COL_W + "px";
+        add(headTrack, cell);
+      }
+      add(headTrack, ganTail());
+      add(headRow, headTrack);
+      add(gan, headRow);
+
+      // パート行
+      ranged.forEach(function (r) {
+        var row = h("div", "gan-row");
+        add(row, h("div", "gan-name", r.part.name));
+        var track = h("div", "gan-track");
+        for (var k = 0; k < days; k++) {
+          var dk = new Date((min + k) * MS_PER_DAY);
+          var w = dk.getUTCDay();
+          var c = h("div", "gan-cell" + (w === 0 || w === 6 ? " we" : ""));
+          c.style.width = GANTT_COL_W + "px";
+          add(track, c);
+        }
+        add(track, ganTail());
+        if (r.s === null) {
+          add(track, h("div", "gan-norange", "見込み未定"));
+        } else {
+          var bar = h("div", "gan-bar");
+          bar.style.left = ((r.s - min) * GANTT_COL_W) + "px";
+          bar.style.width = Math.max(GANTT_COL_W, (r.e - r.s + 1) * GANTT_COL_W) + "px";
+          bar.setAttribute("role", "img");
+          bar.setAttribute("aria-label",
+            r.part.name + " 最短 " + fmtDate(r.part.forecast.earliest) + " 最遅 " + fmtDate(r.part.forecast.latest));
+          add(track, bar);
+          var cap = h("div", "gan-baroff",
+            fmtDate(r.part.forecast.earliest) + " 〜 " + fmtDate(r.part.forecast.latest));
+          cap.style.left = ((r.e - min + 1) * GANTT_COL_W + 6) + "px";
+          add(track, cap);
+        }
+        add(row, track);
+        add(gan, row);
+      });
+
+      add(scroller, gan);
+      add(box, scroller);
+    }
+
+    // --- 一覧（根拠つき）。ガントが出ない場合の唯一の表現でもある
+    var list = h("div", "spec");
+    parts.forEach(function (p) {
+      var row = h("div", "spec-row");
+      add(row, h("div", "spec-k", p.name));
+      var v = h("div", "spec-v");
+      var rangeText = "最短 " + (p.forecast.earliest ? fmtDate(p.forecast.earliest) : DASH) +
+        " ／ 最遅 " + (p.forecast.latest ? fmtDate(p.forecast.latest) : DASH);
+      add(v, h("div", "mono", rangeText));
+      if (p.basis) add(v, h("div", null, p.basis));
+      add(row, v);
+      add(list, row);
+    });
+    add(box, list);
+
+    return section("パート別の見込み", box, "バーは確定スケジュールではなく、最短〜最遅の見込みレンジです。");
+  }
+
+  function renderRemaining(m) {
+    if (!m.detail.remaining.length) return null;
+    var ul = h("ul", "list");
+    m.detail.remaining.forEach(function (s) { add(ul, h("li", null, s)); });
+    return section("残作業", ul);
+  }
+
+  function renderForecastLog(m) {
+    if (!m.forecastLog.length) return null;
+    var ul = h("ul", "log");
+    m.forecastLog.forEach(function (x) {
+      var li = h("li");
+      add(li, h("span", "d", x.asOf ? fmtDate(x.asOf) : DASH));
+      add(li, h("span", "d", "最短 " + (x.earliest ? fmtDate(x.earliest) : DASH) +
+        " ／ 最遅 " + (x.latest ? fmtDate(x.latest) : DASH)));
+      add(ul, li);
+    });
+    return section("見込みの推移", ul);
+  }
+
+  function renderLinks(m) {
+    if (!m.detail.links.length) return null;
+    var ul = h("ul", "links");
+    m.detail.links.forEach(function (l) {
+      var li = h("li");
+      var safe = httpUrl(l.url);
+      if (safe) {
+        li.appendChild(linkOrText(safe, l.label || safe));
+        if (l.label) add(li, h("span", "u", safe));
+      } else {
+        add(li, h("span", null, l.label || DASH));
+        if (l.url) add(li, h("span", "u", l.url));
+      }
+      add(ul, li);
+    });
+    return section("関連リンク", ul);
+  }
+
+  function renderFooter(m) {
+    var bits = [];
+    if (m.meta.asOf) bits.push("基準日 " + fmtDate(m.meta.asOf));
+    if (m.facts.generatedAt) bits.push("実績取得 " + fmtDateTime(m.facts.generatedAt));
+    if (!bits.length && !m.meta.artifactUrl) return null;
+    var f = h("div", "foot");
+    if (bits.length) add(f, h("div", null, bits.join(" / ")));
+    if (m.meta.artifactUrl) {
+      var line = h("div");
+      line.appendChild(document.createTextNode("このページ: "));
+      line.appendChild(linkOrText(m.meta.artifactUrl, m.meta.artifactUrl));
+      add(f, line);
+    }
+    return f;
+  }
+
+  /* =========================================================
+   * 7. 組み立て
+   * =======================================================*/
+  function renderAll(model, warning) {
+    var app = document.getElementById("app");
+    app.textContent = "";
+    renderMasthead(model);
+
+    if (warning) add(app, noticeNode("データに問題があります", warning, true));
+
+    var prsByPart = buildPrIndex(model.facts.prs);
+    var states = derivePartStates(model.parts, prsByPart);
+
+    // 前半
+    add(app, safeNode(renderLede, model));
+    var fcCard = safeNode(renderForecastCard, model);
+    var askCard = safeNode(renderAsks, model);
+    if (fcCard || askCard) {
+      var grid = h("div", "grid2");
+      add(grid, fcCard, askCard);
+      add(app, grid);
+    }
+    add(app, safeNode(renderFlow, model, states));
+
+    // 区切り
+    add(app, renderDivider());
+
+    // 後半（順序 = 仕様のページ構成）
+    [
+      renderFeature, renderWatch, renderDiagram, renderSpec,
+      renderPrTable, renderTargets, renderIssues, renderBranches,
+      renderPlanDiff, renderPartForecast, renderRemaining, renderForecastLog, renderLinks
+    ].forEach(function (fn) {
+      add(app, safeNode(fn, model));
+    });
+
+    add(app, safeNode(renderFooter, model));
+
+    if (!app.childNodes.length) {
+      add(app, noticeNode("表示できる内容がありません",
+        "state.json は読み込めましたが、描画できる項目が含まれていませんでした。", false));
+    }
+  }
+
+  function noticeNode(title, detail, isWarn) {
+    var box = h("div", "notice");
+    add(box, h("h2", null, title));
+    add(box, h("p", null, detail));
+    if (isWarn) add(box, h("p", "why", "表示できる範囲だけを描画しています。"));
+    return box;
+  }
+
+  function renderFatal(reason) {
+    var app = document.getElementById("app");
+    app.textContent = "";
+    var box = h("div", "notice");
+    add(box, h("h2", null, "state.json を読み込めませんでした"));
+    add(box, h("p", null, "このページは同じ場所に置かれた state.json を読み込んで表示します。ファイルが見つからないか、内容が JSON として壊れています。"));
+    add(box, h("p", "why", "詳細: " + reason));
+    add(app, box);
+  }
+
+  /* =========================================================
+   * 8. 起動
+   * =======================================================*/
+  function boot() {
+    var req;
+    try {
+      req = fetch(STATE_URL, { cache: "no-store" });
+    } catch (e) {
+      renderFatal(String(e && e.message ? e.message : e));
+      return;
+    }
+    req.then(function (res) {
+      if (!res.ok) throw new Error("HTTP " + res.status + " " + res.statusText);
+      return res.text();
+    }).then(function (text) {
+      var raw;
+      try {
+        raw = JSON.parse(text);
+      } catch (e) {
+        throw new Error("JSON として解釈できません: " + (e && e.message ? e.message : e));
+      }
+      var warning = "";
+      if (!isPlainObject(raw)) {
+        warning = "state.json の中身がオブジェクトではありません（配列や数値など）。既定値で描画します。";
+        raw = {};
+      }
+      var model = normalize(raw);
+      try {
+        renderAll(model, warning);
+      } catch (e) {
+        var app = document.getElementById("app");
+        app.textContent = "";
+        app.appendChild(noticeNode("内容を表示できませんでした",
+          "state.json は読み込めましたが、描画中に問題が発生しました: " + (e && e.message ? e.message : e), false));
+      }
+    }).catch(function (err) {
+      try {
+        renderFatal(String(err && err.message ? err.message : err));
+      } catch (e2) {
+        var app = document.getElementById("app");
+        if (app) app.textContent = "state.json を読み込めませんでした。";
+      }
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", boot);
+  } else {
+    boot();
+  }
+})();
+</script>

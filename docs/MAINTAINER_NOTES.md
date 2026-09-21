@@ -63,6 +63,24 @@
 - [ ] 参照元(観点ファイルの該当節・担当 Sub Agent の評価手順)から相互参照を追記
 - [ ] CHANGELOG に記録
 
+## Skill を追加する場合
+
+- [ ] `skills/<skill-name>/SKILL.md` を追加(frontmatter キー: `name` / `description`。
+      `description` は auto-invocation のヒントになるため発火語と参照元コマンドを含める)
+- [ ] スキーマ・詳細仕様は SKILL.md に書かず、別ファイル(例: `SCHEMA.md`)に分けて
+      単一情報源にする
+- [ ] 実体を持つ資産(HTML / スクリプト / サンプルデータ)は `skills/<skill-name>/assets/`
+      に置く
+- [ ] `install.sh` が新しい Skill ディレクトリを配置対象に含んでいるか確認する
+      (`skills/` 配下をディレクトリ走査しているため、通常は追加作業不要)
+- [ ] シェルスクリプトを資産に含む場合、CI の `shellcheck` ジョブの対象に追加する
+- [ ] `*.md` に `NN観点`(2桁数字+観点)という表記を書かない
+      (`check-sync.sh` の観点数表記チェックが誤検知する)
+- [ ] README.md の構成説明・ドキュメント一覧を更新する
+- [ ] docs/ARCHITECTURE.md に構成を追記する
+- [ ] CHANGELOG.md の `[Unreleased]` に `### Added` で記録する
+- [ ] `./install.sh` を再実行し、`~/.claude/skills/` への反映を確認する
+
 ## Sub Agent を追加・改修する場合
 
 `agents/` には観点レビュアー(`*-reviewer.md`、12個)とユーティリティエージェント(coder / coder-hard / tester / researcher / researcher-deep、5個)の2種類があり、担当・節構成・成果物の性質が異なるため、種別ごとにチェックリストを分ける。
@@ -118,7 +136,7 @@
 | ジョブ | 内容 | ローカル再現 |
 |---|---|---|
 | `unicode` | コマンドファイル・観点ファイル等への不可視文字/双方向制御文字/BOM の混入検出(prompt injection 予防) | `LC_ALL=C.UTF-8 grep -rPln '[\x{200B}-\x{200F}\x{202A}-\x{202E}\x{2066}-\x{2069}\x{FEFF}]' --include='*.md' --include='*.sh' --include='*.yml' --include='*.yaml' .` |
-| `shellcheck` | `install.sh` / `bootstrap.sh` / `check-sync.sh` の静的解析 | `shellcheck install.sh bootstrap.sh check-sync.sh` |
+| `shellcheck` | `install.sh` / `bootstrap.sh` / `check-sync.sh` / Skill資産のシェルスクリプトの静的解析 | `shellcheck install.sh bootstrap.sh check-sync.sh skills/progress-report/assets/fetch-facts.sh` |
 | `sync` | 観点ライブラリの同期漏れ検出(観点数表記・カタログ表・分類マトリクスの三者一致) | `make check`(= `bash ./check-sync.sh`) |
 | `gitleaks` | シークレットの誤コミット検出 | `gitleaks detect` |
 
