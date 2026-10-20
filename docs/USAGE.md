@@ -1,6 +1,6 @@
 # USAGE
 
-収録している各コマンドの使い方・引数・実行例をまとめる。汎用コマンド10個と、レビュー用コマンド3個の2章構成。
+収録している各コマンドの使い方・引数・実行例をまとめる。汎用コマンド10個と、レビュー用コマンド4個の2章構成。
 
 ## 汎用コマンド
 
@@ -297,7 +297,7 @@ PR 番号を省略する場合(カレントブランチに紐づく PR を使用
 
 ## レビューコマンド
 
-3つのレビュー用コマンドの使い分け・引数・実行例。観点・分類の本体は Skill 側(`skills/code-review-perspectives/`)にあり、本コマンドは薄いオーケストレータとして Sub Agent に委任する。
+4つのレビュー用コマンドの使い分け・引数・実行例。観点・分類の本体は Skill 側(`skills/code-review-perspectives/`)にあり、本コマンドは薄いオーケストレータとして Sub Agent に委任する。ただし `/review-pull-request-adversarial` は観点ライブラリを使わず、専用ワーカーに委任する。
 
 ### 使い分け
 
@@ -306,6 +306,7 @@ PR 番号を省略する場合(カレントブランチに紐づく PR を使用
 | PR・ブランチ差分を多観点で評価したい | `/review-branch` |
 | リポジトリ全体の健康診断(分類別の問題棚卸し、優先順位、スコア推移) | `/review-repo` |
 | 起点ファイルから依存スライスを構築し、入口→出口の流れで評価したい | `/review-slice` |
+| PR を敵対的に読み、ブロッカーだけを検証済みで出したい | `/review-pull-request-adversarial` |
 
 ### 共通の挙動
 
@@ -440,6 +441,37 @@ PERSPECTIVES と `--categories` は **AND** で絞り込み。交差セルが空
 4. **Phase 3**: スライスサマリ(構成サマリ／Critical・High／推奨アクション／観点別スコア 1〜5)
 
 slice で評価しない観点(`documentation`, `dead-code`, `duplication`, `hotspot`, `architecture-drift`, `test-strategy` 等)は対象外。詳細は各観点の frontmatter `applicable_commands` を参照。
+
+---
+
+### `/review-pull-request-adversarial` — PR の敵対的レビュー
+
+#### 引数
+
+| 引数 | 既定 | 説明 |
+|---|---|---|
+| 第1引数 | (必須) | PR の URL または PR 番号。空・不正な形式・別リポジトリの URL・存在しない PR は開始前にエラー停止 |
+
+#### 例
+
+| 入力 | 動作 |
+|---|---|
+| `/review-pull-request-adversarial 123` | カレントリポジトリの PR #123 を評価 |
+| `/review-pull-request-adversarial https://github.com/<owner>/<repo>/pull/123` | URL 指定(カレントリポジトリと一致する場合のみ) |
+
+#### 流れ
+
+1. **Phase 0**: PR の概要・変更ファイル・CI 状況を取得し、head を一時 worktree に展開(作業中のブランチは切り替えない)
+2. **Phase 1**: `adversarial-reviewer` が7観点で全指摘を出す
+3. **Phase 2**: ブロッカー候補を1件ずつ `finding-verifier` に並列で渡し、反証の立場で検証(確定 / 条件付き / 棄却)
+4. **Phase 3**: 全指摘と検証結果を保存し、確定・条件付きのブロッカーだけでスレッド文面と総括を表示。worktree を削除
+
+#### 注意
+
+- 途中のフェーズでは確認を取らず、最後に結果の全文を表示する。
+- GitHub へのコメント投稿・レビュー送信はしない。文面は自分で貼る。
+- 全指摘・検証結果(棄却分を含む)は `.claude/reviews/pr-<番号>-<head SHA7桁>.md` に保存される。同じコミットを再レビューすると上書きされる。
+- `.claude/reviews/` が git の無視対象でない場合は、`.git/info/exclude` への追加が案内される(自動では編集しない)。
 
 ---
 

@@ -65,7 +65,7 @@
 
 ## Sub Agent を追加・改修する場合
 
-`agents/` には観点レビュアー(`*-reviewer.md`、12個)とユーティリティエージェント(coder / coder-hard / tester / researcher / researcher-deep、5個)の2種類があり、担当・節構成・成果物の性質が異なるため、種別ごとにチェックリストを分ける。
+`agents/` には観点レビュアー(`*-reviewer.md`、12個)・ユーティリティエージェント(coder / coder-hard / tester / researcher / researcher-deep、5個)・コマンド専用ワーカー(adversarial-reviewer / finding-verifier、2個)の3種類があり、担当・節構成・成果物の性質が異なるため、種別ごとにチェックリストを分ける。
 
 ### 観点レビュアーの場合(`*-reviewer.md`)
 
@@ -86,6 +86,16 @@
 - [ ] 完了報告に、作成した文面系成果物(コミットメッセージ案・実装方針・調査結果本文など、該当する場合)を要約せず全文含めるよう本文に明記する(`config/CLAUDE.md` の文面系成果物の全文提示ルールと整合させる)
 - [ ] [README.md](../README.md) の `agents/` 構成説明(観点レビュアー/ユーティリティエージェントの内訳・個数)に差分が無いか確認し、必要なら更新する
 - [ ] [docs/USAGE.md](USAGE.md) に影響が無いか確認する(現状ユーティリティエージェントは対象外だが、記述が必要になった場合は追記する)
+- [ ] CHANGELOG に記録
+
+### コマンド専用ワーカーの場合(adversarial-reviewer / finding-verifier)
+
+- [ ] 節構成は「入力 / 手順 / 出力形式 / 注意」とする
+- [ ] `tools:` は **最小権限の原則** に従う
+- [ ] `model:` を明示指定する
+- [ ] git の履歴を変更する操作(commit / push / checkout / reset 等)を行わない旨を本文に明記する
+- [ ] 呼び出し元コマンドの委任記述を更新する
+- [ ] `docs/ARCHITECTURE.md` の「コマンド専用ワーカー」表を更新する
 - [ ] CHANGELOG に記録
 
 ## レビュー用 Slash Command を追加・改修する場合
