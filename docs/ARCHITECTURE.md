@@ -6,6 +6,7 @@
 ┌──────────────────────────────────────────────────┐
 │ Slash Command(薄いオーケストレータ、各100行以下)   │
 │  /review-branch  /review-repo  /review-slice     │
+│  /review-pull-request-adversarial(専用ワーカー)    │
 │  - 引数パース・Phase 0 準備                          │
 │  - Sub Agent への並列委任                            │
 │  - 結果集約・セルフレビュー・サマリー出力             │
@@ -78,6 +79,15 @@
 | `slice-flow-reviewer` | slice-cohesion ＋ 入口→出口情報フロー追跡(review-slice 専用) |
 
 合計34観点を**漏れ・重複なく**カバーする。
+
+## コマンド専用ワーカー
+
+観点ライブラリを使わず、特定のコマンドからのみ呼ばれるワーカー。上の12個とは別の種別。
+
+| Agent | 呼び出し元コマンド | 役割 |
+|---|---|---|
+| `adversarial-reviewer` | `/review-pull-request-adversarial` | PR を7観点で敵対的に読み、全指摘を構造化して返す |
+| `finding-verifier` | `/review-pull-request-adversarial` | 指摘1件を反証の立場で検証し、確定 / 条件付き / 棄却とブロッカー妥当性を返す |
 
 ## 観点・分類・コマンドの観点適用
 

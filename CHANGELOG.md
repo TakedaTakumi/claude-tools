@@ -7,6 +7,9 @@
 
 ### Added
 
+- **レビューコマンド** `commands/review-pull-request-adversarial.md` を追加: PR を敵対的にレビューし、ブロッカー候補を別のサブエージェントで独立に検証して、レビュースレッドの文面と総括を作る。全指摘と検証結果は `.claude/reviews/` に保存する(`allowed-tools`: `Bash(git rev-parse:*)`, `Bash(git fetch:*)`, `Bash(git worktree:*)`, `Bash(git check-ignore:*)`, `Bash(gh pr view:*)`, `Bash(gh pr checks:*)`, `Bash(gh repo view:*)`, `Read`, `Grep`, `Glob`, `Write`)
+- **Sub Agent** `agents/adversarial-reviewer.md` を追加: PR を7観点で敵対的に読み、全指摘を構造化して返すコマンド専用ワーカー(tools は Read/Grep/Glob + Bash(git:*)/Bash(rg:*))
+- **Sub Agent** `agents/finding-verifier.md` を追加: 指摘1件を反証の立場で検証するコマンド専用ワーカー(tools は adversarial-reviewer と同じ)
 - **Sub Agent** `agents/` に5ファイル追加: coder / coder-hard / researcher / researcher-deep / tester(観点レビュアー12個とは別のユーティリティエージェント。tools は最小権限の原則に従い、コーディング系は Read/Write/Edit + Bash(git:*)、テスト実行を担う tester は Read/Write/Edit + Bash、調査系は Read/Grep/Glob(+WebSearch/WebFetch)で明示指定)
 - **汎用コマンド** `commands/new-issue.md` を追加: 会話の文脈・依頼内容からタイトル・本文を作成し、ユーザーの承認を得たうえで `gh issue create` で issue を作成する(`allowed-tools`: `Bash(git rev-parse:*)`, `Bash(gh issue create:*)`, `Read`, `Grep`, `Glob`)
 - **汎用コマンド** `commands/visualize.md` を追加: 指定した資料やトピックの内容を、専門用語・根拠(ファイルパス・行番号・出典URL・原文引用)・列挙項目の件数を保ったまま、図と構造で読み解ける HTML に組み替える(`allowed-tools`: `Read`, `Grep`, `Glob`, `Write`, `Skill`)
@@ -17,6 +20,8 @@
 
 ### Changed
 
+- README の install.sh 説明を実装に合わせて訂正(`commands/*.md` / `agents/*.md` の全ファイルを配置する)
+- `docs/MAINTAINER_NOTES.md`: Sub Agent の種別に「コマンド専用ワーカー」を追加し、チェックリストを追記
 - `/sync-docs`: 現在のブランチに紐づく PR のタイトル・本文も更新検討の対象に追加(承認後に `gh pr edit` で更新。PR が無い場合や `gh` が使えない場合はスキップ)
 - `/new-pull-request`: `gh pr create` の前にタイトル・本文の全文をユーザーに提示して承認を得るステップを追加(無承認のまま Draft PR が作成される事故を防止)
 - `config/CLAUDE.md`: 文面系成果物(コミットメッセージ案・PR/issue文面・実装計画・提案文など)の確認を求める際は、質問ツールを呼ぶ前に全文を通常のテキストとして提示することを明記。Fable モデル運用時は、サブエージェントへの委任指示に全文報告を明記すること、およびオーケストレーターが文面を要約せずそのまま提示することを追加

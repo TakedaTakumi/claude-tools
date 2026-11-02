@@ -19,13 +19,14 @@
 | `/sync-docs` | ブランチでの変更に伴い、影響を受けるドキュメントを特定して更新する |
 | `/visualize` | 指定した資料やトピックを、図と構造で読み解ける HTML にする(用語・根拠・件数を保持) |
 
-### レビューコマンド(3個)
+### レビューコマンド(4個)
 
 | コマンド | 説明 |
 |---|---|
 | `/review-branch` | ブランチの変更(差分)を多観点で評価する |
 | `/review-repo` | リポジトリ全体を「ファイル分類 × 観点」で健康診断する |
 | `/review-slice` | 起点(ファイル or `ファイル::シンボル`)から依存を辿って機能スライスを構築し評価する |
+| `/review-pull-request-adversarial` | PR を敵対的にレビューし、ブロッカー候補を別エージェントで独立に検証して、スレッド文面と総括を作る(観点ライブラリは使わない) |
 
 レビューコマンドは、**Skill(観点ライブラリ)+ Sub Agent(専門ワーカー)+ 軽量 Slash Command(オーケストレータ)** の組み合わせで構成する。
 
@@ -38,7 +39,8 @@ skills/code-review-perspectives/   # 観点ライブラリ(SKILL.md + perspectiv
 agents/                            # Sub Agent環境
                                    # - 観点レビュアー(12個、*-reviewer.md)
                                    # - ユーティリティエージェント(5個)
-commands/                          # 全13コマンド(汎用10 + レビュー用3、薄いオーケストレータ)
+                                   # - コマンド専用ワーカー(2個、/review-pull-request-adversarial 用)
+commands/                          # 全14コマンド(汎用10 + レビュー用4、薄いオーケストレータ)
 config/CLAUDE.md                   # グローバルユーザーメモリ
 docs/                              # ドキュメント
 install.sh / bootstrap.sh          # ~/.claude/ への配置スクリプト
@@ -84,7 +86,7 @@ make check                # 観点ライブラリの同期チェック(CI の sy
 | ローカル開発(コマンドや観点をその場で編集して反映したい) | `./install.sh`(symlink) | リポジトリ更新が即反映 |
 | **VSCode 拡張版 Claude Code** | `./install.sh --copy` | 拡張版がスラッシュコマンドを discovery する際、symlink を辿らずコマンド一覧に出ないことがある |
 | `~/.claude` を別 Docker コンテナにバインドする運用 | `./install.sh --copy` | symlink のターゲットパスはコンテナ内に存在しないため壊れる |
-| `~/.claude` を本リポジトリ以外の用途にも使っている | (通常はそのまま symlink で問題なし) | install.sh は `CLAUDE.md` / `commands/` 配下13ファイル / `agents/` 配下の `*-reviewer.md` 12個 / `skills/code-review-perspectives` 以外には触れない。同名衝突がある場合はガードが効いて確認を求める |
+| `~/.claude` を本リポジトリ以外の用途にも使っている | (通常はそのまま symlink で問題なし) | install.sh は `CLAUDE.md` / `commands/*.md` / `agents/*.md` の全ファイル / `skills/code-review-perspectives` 以外には触れない。同名衝突がある場合はガードが効いて確認を求める |
 
 `--copy` で配置した場合、コマンド・観点・Agent・`CLAUDE.md` を編集した後は `./install.sh --copy` の再実行が必要です(symlink では不要)。
 
@@ -118,7 +120,7 @@ curl -fsSL https://raw.githubusercontent.com/TakedaTakumi/claude-tools/main/boot
 
 ## ドキュメント
 
-- [docs/USAGE.md](docs/USAGE.md) — 全13コマンドの使い方・引数・実行例
+- [docs/USAGE.md](docs/USAGE.md) — 全14コマンドの使い方・引数・実行例
 - [docs/MAINTAINER_NOTES.md](docs/MAINTAINER_NOTES.md) — コマンド・観点・Agent 追加/変更/削除時のチェックリスト
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — Skill + Sub Agent + Slash Command の設計
 - [docs/PERSPECTIVES.md](docs/PERSPECTIVES.md) — 34観点のカタログ
