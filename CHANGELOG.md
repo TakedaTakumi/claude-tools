@@ -7,7 +7,7 @@
 
 ### Added
 
-- **レビューコマンド** `commands/review-pull-request-adversarial.md` を追加: PR を敵対的にレビューし、ブロッカー候補を別のサブエージェントで独立に検証して、レビュースレッドの文面と総括を作る。全指摘と検証結果は `.claude/reviews/` に保存する(`allowed-tools`: `Bash(git rev-parse:*)`, `Bash(git fetch:*)`, `Bash(git worktree:*)`, `Bash(git check-ignore:*)`, `Bash(gh pr view:*)`, `Bash(gh pr checks:*)`, `Bash(gh repo view:*)`, `Read`, `Grep`, `Glob`, `Write`)
+- **レビューコマンド** `commands/review-pull-request-adversarial.md` を追加: PR を敵対的にレビューし、ブロッカー候補を別のサブエージェントで独立に検証して、レビュースレッドの文面と総括を作る。全指摘と検証結果はセッションのスクラッチパッド(利用できなければ `mktemp -d` の一時ディレクトリ)に保存する(`allowed-tools`: `Bash(git rev-parse:*)`, `Bash(git fetch:*)`, `Bash(git worktree:*)`, `Bash(mktemp:*)`, `Bash(gh pr view:*)`, `Bash(gh pr checks:*)`, `Bash(gh repo view:*)`, `Read`, `Grep`, `Glob`, `Write`)
 - **Sub Agent** `agents/adversarial-reviewer.md` を追加: PR を7観点で敵対的に読み、全指摘を構造化して返すコマンド専用ワーカー(tools は Read/Grep/Glob + Bash(git:*)/Bash(rg:*))
 - **Sub Agent** `agents/finding-verifier.md` を追加: 指摘1件を反証の立場で検証するコマンド専用ワーカー(tools は adversarial-reviewer と同じ)
 - **Sub Agent** `agents/` に5ファイル追加: coder / coder-hard / researcher / researcher-deep / tester(観点レビュアー12個とは別のユーティリティエージェント。tools は最小権限の原則に従い、コーディング系は Read/Write/Edit + Bash(git:*)、テスト実行を担う tester は Read/Write/Edit + Bash、調査系は Read/Grep/Glob(+WebSearch/WebFetch)で明示指定)
